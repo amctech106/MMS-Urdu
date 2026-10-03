@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>داخلہ فارم - مدرسہ مینجمنٹ سسٹم</title>
+    <title>مدرسہ مینجمنٹ سسٹم - لاگ ان</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @font-face {
             font-family: 'JameelNooriNastaleeq';
-            src: url('./fonts/JameelNooriNastaleeq.ttf') format('truetype');
+            src: url('./fonts/Jameel\ Noori\ Nastaleeq.ttf') format('truetype');
         }
         body {
             font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
@@ -16,255 +16,56 @@
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
 
-    <!-- ٹاپ نیویگیشن -->
-    <nav class="bg-green-700 text-white p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">نیا داخلہ فارم</h1>
-            <a href="dashboard.html" class="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 transition font-bold">واپس ڈیش بورڈ</a>
+    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-xl border-t-4 border-green-700">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-green-800 mb-2">دارالعلوم جامعہ نعیمیہ</h1>
+            <p class="text-gray-600 text-lg">مدرسہ مینجمنٹ سسٹم (ERP)</p>
         </div>
-    </nav>
 
-    <!-- داخلہ فارم کا مرکزی حصہ -->
-    <main class="container mx-auto p-6 flex-grow flex justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-4xl border-t-4 border-green-700 relative">
-            
-            <!-- ہیڈر اور تصویر کا سیکشن (ہیڈر لائن کے نیچے بالکل دائیں طرف تصویر) -->
-            <div class="flex justify-between items-start mb-8 border-b-2 border-gray-200 pb-4">
-                <div class="text-right flex-grow">
-                    <h2 class="text-3xl font-bold text-green-800">دارالعلوم جامعہ نعیمیہ - داخلہ فارم برائے <span id="branchTitleDisplay">بنین</span></h2>
-                    <p class="text-gray-600 mt-2">فیڈرل بی ایریا کراچی</p>
-                </div>
-                
-                <!-- تصویر اور اپلوڈ باکس (دائیں طرف ہیڈر کے ساتھ) -->
-                <div class="flex flex-col items-center ml-4">
-                    <div class="w-28 h-32 bg-gray-200 border-2 border-dashed border-gray-400 flex items-center justify-center text-gray-500 rounded mb-1 text-xs">
-                        تصویر یہاں آئے گی
-                    </div>
-                    <input type="file" id="studentPhoto" accept="image/*" class="text-xs w-32">
-                </div>
+        <form id="loginForm" class="space-y-6">
+            <!-- برانچ کا انتخاب -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">شعبہ (برانچ) منتخب کریں:</label>
+                <select id="branchSelect" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 text-xl">
+                    <option value="central">مرکزی شعبہ (بنین)</option>
+                    <option value="branches">دیگر برانچز</option>
+                    <option value="girls">شعبہ بنات (طالبات)</option>
+                </select>
             </div>
 
-            <form id="admissionForm" class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                
-                <!-- نام طالب علم -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">نام <span class="student-label">طالب علم</span>:</label>
-                    <input type="text" id="studentName" class="w-full px-4 py-2 border rounded-md bg-gray-50" required>
-                </div>
+            <!-- یوزر آئی ڈی -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">یوزر آئی ڈی:</label>
+                <!-- فی الحال ٹیسٹنگ کے لیے آپ یہاں کچھ بھی ٹائپ کر سکتے ہیں -->
+                <input type="text" id="username" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 text-xl" required>
+            </div>
 
-                <!-- ولدیت -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1"><span class="parent-label">ولدیت</span>:</label>
-                    <input type="text" id="parentName" class="w-full px-4 py-2 border rounded-md bg-gray-50" required>
-                </div>
+            <!-- پاس ورڈ -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">پاس ورڈ:</label>
+                <input type="password" id="password" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 text-xl" required>
+            </div>
 
-                <!-- شہریت -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">شہریت (پاکستانی):</label>
-                    <input type="text" id="nationality" value="پاکستانی" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
+            <!-- لاگ ان بٹن -->
+            <button type="submit" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-4 rounded-md text-2xl transition duration-300">
+                سسٹم میں داخل ہوں
+            </button>
+        </form>
+    </div>
 
-                <!-- تاریخِ پیدائش -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">تاریخِ پیدائش:</label>
-                    <input type="date" id="dob" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- تعلیمی قابلیت -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">تعلیمی قابلیت:</label>
-                    <input type="text" id="education" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- ضامن / سرپرست کا نام -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">ضامن / سرپرست کا نام:</label>
-                    <input type="text" id="guardianName" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- درجہ -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">درجہ:</label>
-                    <select id="classSelect" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                        <option value="">درجہ منتخب کریں...</option>
-                        <option value="تجوید سال اول">تجوید سال اول</option>
-                        <option value="تحفیظ القرآن">تحفیظ القرآن</option>
-                        <option value="عالمہ / عالم سال اول">عالمہ / عالم سال اول</option>
-                    </select>
-                </div>
-
-                <!-- رجسٹریشن نمبر -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">رجسٹریشن نمبر:</label>
-                    <input type="text" id="regNumber" class="w-full px-4 py-2 border rounded-md bg-gray-50" placeholder="خودکار یا دستی">
-                </div>
-
-                <!-- رابطہ نمبر -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">رابطہ نمبر:</label>
-                    <input type="text" id="phone" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- والد / سرپرست کے موبائل کا نمبر -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">والد / سرپرست کے موبائل کا نمبر:</label>
-                    <input type="text" id="guardianPhone" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- مستقل پتا -->
-                <div class="md:col-span-2">
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">مستقل پتا:</label>
-                    <input type="text" id="permanentAddress" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- موجودہ پتا -->
-                <div class="md:col-span-2">
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">موجودہ پتا:</label>
-                    <input type="text" id="currentAddress" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- والد کا پیشہ -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">والد کا پیشہ:</label>
-                    <input type="text" id="fatherProfession" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- نام گواہ -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">نام گواہ:</label>
-                    <input type="text" id="witnessName" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- بن -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">بن:</label>
-                    <input type="text" id="witnessParent" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- دستخط سرپرست -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">دستخط سرپرست:</label>
-                    <input type="text" id="guardianSignature" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- شناختی کارڈز اور ب فارم (ریڈیو بٹن کے ساتھ) -->
-                <div class="md:col-span-2 bg-gray-50 p-4 rounded-lg border space-y-3">
-                    <label class="block text-lg font-semibold text-gray-700">شناخت کی نوعیت (کوئی ایک منتخب کریں):</label>
-                    
-                    <div class="flex flex-col md:flex-row gap-4">
-                        <label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
-                            <input type="radio" name="idType" value="student_cnic" class="w-4 h-4 text-green-600">
-                            <span>طالب علم کا قومی شناختی کارڈ نمبر</span>
-                        </label>
-                        <label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
-                            <input type="radio" name="idType" value="guardian_cnic" class="w-4 h-4 text-green-600">
-                            <span>والد یا سرپرست کا قومی شناختی کارڈ نمبر</span>
-                        </label>
-                        <label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
-                            <input type="radio" name="idType" value="b_form" class="w-4 h-4 text-green-600" checked>
-                            <span>فارم "ب"</span>
-                        </label>
-                    </div>
-                    
-                    <div>
-                        <input type="text" id="idNumberValue" class="w-full px-4 py-2 border rounded-md bg-white mt-2" placeholder="منتخب کردہ شناختی کارڈ یا ب فارم کا نمبر درج کریں...">
-                    </div>
-                </div>
-
-                <!-- سرپرست سے رشتہ -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">سرپرست سے رشتہ:</label>
-                    <input type="text" id="guardianRelation" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- دستخط ناظم اعلیٰ / مہتمم / سربراہ -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">دستخط ناظم اعلیٰ / مہتمم / سربراہ:</label>
-                    <input type="text" id="principalSignature" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- تاریخِ داخلہ -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">تاریخِ داخلہ:</label>
-                    <input type="date" id="admissionDate" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- اختتامِ داخلہ -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">اختتامِ داخلہ (سیشن):</label>
-                    <input type="date" id="endDate" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- داخلہ نمبر -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">داخلہ نمبر:</label>
-                    <input type="text" id="admissionNumber" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                <!-- بٹنز -->
-                <div class="md:col-span-2 flex justify-end space-x-4 space-x-reverse mt-6">
-                    <button type="reset" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition text-lg">فارم کلین کریں</button>
-                    <button type="submit" class="bg-blue-700 text-white px-8 py-2 rounded hover:bg-blue-800 transition font-bold text-lg shadow-lg">محفوظ کریں</button>
-                </div>
-            </form>
-        </div>
-    </main>
-
-    <!-- جاوا اسکرپٹ -->
-    <script type="module">
-        import { supabase } from './js/supabase.js';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const activeBranch = localStorage.getItem('activeBranch') || 'central';
-            const branchTitleDisplay = document.getElementById('branchTitleDisplay');
-            
-            if(activeBranch === 'girls') {
-                branchTitleDisplay.innerText = 'شعبہ بنات';
-                document.querySelectorAll('.student-label').forEach(el => el.innerText = 'طالبہ');
-                document.querySelectorAll('.parent-label').forEach(el => el.innerText = 'بنت');
-            } else {
-                branchTitleDisplay.innerText = 'بنین (مرکزی)';
-            }
-        });
-
-        document.getElementById('admissionForm').addEventListener('submit', async function(e) {
+    <script>
+        // لاگ ان ہونے پر ڈیش بورڈ پر بھیجنے کی لاجک
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-
-            const studentName = document.getElementById('studentName').value;
-            const parentName = document.getElementById('parentName').value;
-            const branchType = localStorage.getItem('activeBranch') || 'central';
-            const parentRelation = (branchType === 'girls') ? 'بنت' : 'ولد';
-            const regNumber = document.getElementById('regNumber').value || ('REG-' + new Date().getTime());
-            const phone = document.getElementById('phone').value;
-            const permanentAddress = document.getElementById('permanentAddress').value;
-
-            try {
-                const { data, error } = await supabase
-                    .from('students')
-                    .insert([
-                        {
-                            reg_number: regNumber,
-                            branch_type: branchType,
-                            student_name: studentName,
-                            parent_relation: parentRelation,
-                            parent_name: parentName,
-                            phone: phone,
-                            permanent_address: permanentAddress,
-                            status: 'داخل شدہ'
-                        }
-                    ]);
-
-                if (error) {
-                    alert('ڈیٹا محفوظ کرنے میں مسئلہ: ' + error.message);
-                } else {
-                    alert('طالب علم کا داخلہ فارم کامیابی سے محفوظ ہو گیا ہے!');
-                    document.getElementById('admissionForm').reset();
-                }
-            } catch (err) {
-                alert('سسٹم میں خرابی پیش آئی۔');
-            }
+            const branch = document.getElementById('branchSelect').value;
+            
+            // برانچ کی سیٹنگ لوکل اسٹوریج میں محفوظ کریں تاکہ باقی پیجز پر بھی کام آئے
+            localStorage.setItem('activeBranch', branch);
+            
+            // لاگ ان کے بعد سیدھا ڈیش بورڈ پر بھیج دیں
+            window.location.href = 'dashboard.html';
         });
     </script>
 </body>
