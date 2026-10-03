@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مین ڈیش بورڈ - مدرسہ مینجمنٹ سسٹم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'JameelNooriNastaleeq';
+            src: url('./fonts/JameelNooriNastaleeq.ttf') format('truetype');
+        }
+        body {
+            font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
+            background-color: #e5e7eb;
+        }
+        .menu-item:hover .dropdown {
+            display: block;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- ہیڈر سیکشن -->
+    <header class="bg-white shadow-md border-b-4 border-green-700 p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <!-- لوگو کی جگہ -->
+                <div class="w-16 h-16 bg-green-100 rounded-full border-2 border-green-700 flex items-center justify-center text-green-700 font-bold">لوگو</div>
+                <div>
+                    <h1 class="text-3xl font-bold text-green-800">دارالعلوم جامعہ نعیمیہ</h1>
+                    <p class="text-gray-600">بلاک 15 فیڈرل بی ایریا کراچی پاکستان</p>
+                </div>
+            </div>
+            <div class="text-left">
+                <span id="branchDisplay" class="bg-green-700 text-white px-4 py-1 rounded-full text-sm">مرکزی شعبہ</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- مین مینیو (Top Navigation) -->
+    <nav class="bg-yellow-500 text-black shadow-md">
+        <div class="container mx-auto">
+            <ul class="flex flex-wrap justify-center space-x-6 space-x-reverse py-2 text-lg font-bold relative">
+                <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">صفحہ اول</li>
+                <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition" onclick="window.location.href='admission.html'">داخلہ فارم</li>
+                <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">طالب علم کارڈ</li>
+                <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">رزلٹ بنائیے</li>
+                <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">ترقی <span class="student-label">طالب علم</span></li>
+                <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">درجہ مٹائیں</li>
+                <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">اندراج مضامین</li>
+                
+                <!-- اساتذہ کا مینیو (جو ڈائنیمک ہوگا) -->
+                <li class="menu-item relative cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">
+                    <span id="teacherMenuLabel">اساتذہ</span> سیکشن
+                    <ul class="dropdown hidden absolute right-0 mt-1 w-48 bg-white text-gray-800 border border-gray-200 shadow-lg rounded-md z-10">
+                        <li class="px-4 py-2 hover:bg-green-100 border-b">نیا اندراج</li>
+                        <li class="px-4 py-2 hover:bg-green-100">حاضری</li>
+                    </ul>
+                </li>
+                
+                <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">مالیات</li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- مرکزی حصہ (سرچ اور ورک اسپیس) -->
+    <main class="flex-grow container mx-auto p-6 flex items-center justify-center bg-[url('bg-pattern.jpg')] bg-cover bg-center">
+        <!-- تلاش کیجیے ماڈیول (مختصر) -->
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl border-t-4 border-blue-600">
+            <h2 class="text-2xl font-bold text-center text-blue-800 mb-6 border-b pb-2">تلاش کیجئے</h2>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <label class="w-1/3 text-lg font-semibold">نام <span class="student-label">طالب علم</span>:</label>
+                    <input type="text" class="w-2/3 px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 bg-green-50">
+                </div>
+                <div class="flex items-center">
+                    <label class="w-1/3 text-lg font-semibold">رجسٹریشن نمبر:</label>
+                    <input type="text" class="w-2/3 px-3 py-2 border rounded focus:ring-2 focus:ring-blue-500 bg-green-50">
+                </div>
+                <div class="text-center pt-4">
+                    <button class="bg-blue-800 text-white px-8 py-2 rounded text-xl hover:bg-blue-900 transition">تلاش کیجئے</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- فوٹر (رپورٹس سیکشن) -->
+    <footer class="bg-blue-900 text-white p-6 mt-auto">
+        <div class="container mx-auto">
+            <h3 class="text-center text-xl font-bold border-b border-blue-700 pb-2 mb-4">رپورٹس</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm">
+                <div class="hover:text-yellow-400 cursor-pointer">الگ الگ امتحان کا نتیجہ</div>
+                <div class="hover:text-yellow-400 cursor-pointer">رزلٹ شیٹ <span class="student-plural-label">طلباء</span></div>
+                <div class="hover:text-yellow-400 cursor-pointer">کشف الدرجات</div>
+                <div class="hover:text-yellow-400 cursor-pointer">تاریخ داخلہ و انتہاء</div>
+                
+                <div class="hover:text-yellow-400 cursor-pointer">حاضری</div>
+                <div class="hover:text-yellow-400 cursor-pointer">کل <span class="student-plural-label">طلباء</span></div>
+                <div class="hover:text-yellow-400 cursor-pointer">خالی امتحانی شیٹ</div>
+                <div class="hover:text-yellow-400 cursor-pointer">رہائشی / غیر رہائشی کل تعداد</div>
+                
+                <div class="hover:text-yellow-400 cursor-pointer col-span-2 md:col-span-1">قواعد و ضوابط</div>
+                <div class="hover:text-red-400 cursor-pointer font-bold col-span-2 md:col-span-1" onclick="logout()">پروگرام بند کریں</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ڈائنیمک لیبلز جاوا اسکرپٹ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeBranch = localStorage.getItem('activeBranch') || 'central';
+            
+            // برانچ کا بیج اپڈیٹ کریں
+            const branchDisplay = document.getElementById('branchDisplay');
+            if(activeBranch === 'girls') branchDisplay.innerText = 'شعبہ بنات (طالبات)';
+            else if(activeBranch === 'branches') branchDisplay.innerText = 'دیگر برانچز';
+            
+            // طالبات والے سیکشن کی اصطلاحات تبدیل کریں
+            if(activeBranch === 'girls') {
+                document.getElementById('teacherMenuLabel').innerText = 'معلمات';
+                
+                document.querySelectorAll('.student-label').forEach(el => {
+                    el.innerText = 'طالبہ';
+                });
+                
+                document.querySelectorAll('.student-plural-label').forEach(el => {
+                    el.innerText = 'طالبات';
+                });
+            }
+        });
+
+        function logout() {
+            if(confirm('کیا آپ واقعی پروگرام بند کر کے لاگ آؤٹ کرنا چاہتے ہیں؟')) {
+                localStorage.removeItem('activeBranch');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
