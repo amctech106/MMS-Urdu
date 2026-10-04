@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داخلہ فارم - پرنٹ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'JameelNooriNastaleeq';
+            src: url('./fonts/Jameel\ Noori\ Nastaleeq.ttf') format('truetype');
+        }
+        body {
+            font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
+            background-color: #e5e7eb;
+        }
+        .print-container {
+            max-width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 20px auto;
+            padding: 15px;
+            border: 5px double black;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid black;
+        }
+        td, th {
+            border: 1px solid black;
+            padding: 8px 14px;
+            vertical-align: middle;
+            font-size: 1.15rem;
+        }
+        @media print {
+            body { background-color: white; }
+            .print-container {
+                margin: 0;
+                border: 4px double black;
+                box-shadow: none;
+                max-width: 100%;
+            }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- پرنٹ اور بیک بٹن (یہ پرنٹ میں نہیں آئیں گے) -->
+    <div class="text-center mt-6 no-print">
+        <button onclick="window.print()" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg text-xl transition">
+            اس فارم کو پرنٹ کریں
+        </button>
+        <button onclick="window.history.back()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg text-xl transition mr-4">
+            واپس جائیں
+        </button>
+    </div>
+
+    <!-- لوڈنگ میسج -->
+    <div id="loadingMessage" class="text-center mt-4 text-xl font-bold text-green-700 no-print">
+        ڈیٹا بیس سے ریکارڈ لوڈ کیا جا رہا ہے، براہ کرم انتظار کریں...
+    </div>
+
+    <!-- اصل فارم (جو پرنٹ ہوگا) -->
+    <div class="print-container" id="formContainer" style="display: none;">
+        
+        <!-- ہیڈر سیکشن -->
+        <div class="flex justify-between items-center mb-4 px-2 mt-2">
+            
+            <!-- لوگو -->
+            <div class="text-right w-1/4 flex justify-start">
+                <div class="w-24 h-24 rounded-full border-2 border-green-700 flex items-center justify-center text-xs overflow-hidden">
+                    <img id="dynamicLogo" src="./images/logo.png" alt="لوگو" class="w-full h-full object-contain" onerror="this.outerHTML='<span class=\'text-green-700 font-bold\'>لوگو</span>'">
+                </div>
+            </div>
+
+            <!-- مرکزی ہیڈنگ -->
+            <div class="text-center w-2/4">
+                <h1 class="text-3xl font-bold mb-2">دارالعلوم جامعہ نعیمیہ فیڈرل بی ایریا کراچی</h1>
+                <h2 class="text-2xl font-bold">داخلہ فارم <span id="dynamicDepartment">تحفیظ القرآن</span></h2>
+            </div>
+
+            <!-- الحاق اور رجسٹریشن -->
+            <div class="text-left leading-loose font-bold text-lg w-1/4">
+                <div>الحاق نمبر: <span id="lbl_affiliateNumber" class="border-b border-black inline-block w-24 border-dashed text-center">------</span></div>
+                <div>رجسٹریشن نمبر: <span id="lbl_regNumberTop" class="border-b border-black inline-block w-24 border-dashed text-center font-sans tracking-wide">------</span></div>
+            </div>
+            
+        </div>
+
+        <!-- ڈیٹا ٹیبل -->
+        <table>
+            <!-- لائن 1 -->
+            <tr>
+                <td class="w-1/2">
+                    <div class="flex justify-between">
+                        <span>نام طالب علم:</span>
+                        <span id="lbl_studentName" class="font-bold text-xl">----</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="flex justify-between">
+                        <span id="lbl_parentLabel">ولدیت:</span>
+                        <span id="lbl_parentName" class="font-bold text-xl">----</span>
+                    </div>
+                </td>
+                <!-- تصویر کا خانہ -->
+                <td rowspan="3" class="w-32 p-1 text-center bg-gray-50">
+                    <img id="lbl_studentPhoto" src="" alt="تصویر" class="w-full h-36 object-cover border border-gray-400" onerror="this.outerHTML='<div class=\'w-full h-36 border border-gray-400 flex items-center justify-center text-sm text-gray-500\'>تصویر موجود نہیں</div>'">
+                </td>
+            </tr>
+            <!-- لائن 2 -->
+            <tr>
+                <td>
+                    <div class="flex justify-between">
+                        <span>شہریت:</span>
+                        <span id="lbl_nationality" class="font-bold text-lg">پاکستانی</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="flex justify-between">
+                        <span>تاریخ پیدائش:</span>
+                        <span id="lbl_dob" class="font-bold font-sans tracking-wide">----</span>
+                    </div>
+                </td>
+            </tr>
+            <!-- لائن 3 -->
+            <tr>
+                <td>
+                    <div class="flex justify-between">
+                        <span>تعلیمی قابلیت:</span>
+                        <span id="lbl_education" class="font-bold text-lg">----</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="flex justify-between">
+                        <span>رہائش:</span>
+                        <span id="lbl_residentialStatus" class="font-bold text-lg">----</span>
+                    </div>
+                </td>
+            </tr>
+            <!-- لائن 4 (اس میں سرخ رنگ والا درجہ ہے) -->
+            <tr>
+                <td>
+                    <div class="flex justify-between">
+                        <span>ضامن / سرپرست کا نام:</span>
+                        <span id="lbl_guardianName" class="font-bold text-xl">----</span>
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div class="flex justify-center gap-2 text-red-600 font-bold text-xl">
+                        <span>الدرجہ:</span>
+                        <span id="lbl_className">----</span>
+                    </div>
+                </td>
+            </tr>
+            <!-- لائن 5 -->
+            <tr>
+                <td>
+                    <div class="flex justify-between">
+                        <span>رابطہ نمبر:</span>
+                        <span id="lbl_phone" class="font-bold font-sans tracking-widest text-lg">----</span>
+                    </div>
+                </td>
+                <td colspan="2">
+                    <div class="flex justify-between">
+                        <span>والد / سرپرست کا موبائل نمبر:</span>
+                        <span id="lbl_guardianPhone" class="font-bold font-sans tracking-widest text-lg">----</span>
+                    </div>
+                </td>
+            </tr>
+            <!-- لائن 6 -->
+            <tr>
+                <td class="text-center font-bold text-lg">مستقل پتا</td>
+                <td colspan="2" class="text-center" id="lbl_permanentAddress">----</td>
+            </tr>
+            <!-- لائن 7 -->
+            <tr>
+                <td class="text-center font-bold text-lg">موجودہ پتا</td>
+                <td colspan="2" class="text-center" id="lbl_currentAddress">----</td>
+            </tr>
+            <!-- لائن 8 -->
+            <tr>
+                <td class="text-center font-bold text-lg">والد کا پیشہ</td>
+                <td colspan="2" class="text-center text-lg" id="lbl_fatherProfession">----</td>
+            </tr>
+
+            <!-- رشتہ -->
+            <tr>
+                <td class="text-center py-3 font-bold text-xl">سرپرست سے رشتہ</td>
+                <td colspan="2" class="text-center font-bold text-xl" id="lbl_guardianRelation">----</td>
+            </tr>
+            <!-- حلف نامہ کی ہیڈنگ -->
+            <tr>
+                <td colspan="3" class="text-center font-bold text-2xl py-2">حلف نامہ</td>
+            </tr>
+            <!-- حلف نامہ کا متن -->
+            <tr>
+                <td colspan="3" class="text-center py-4 text-lg leading-normal px-6">
+                    میں مسمی <span id="affidavit_guardian" class="font-bold">----</span> تصدیق کرتاہوں / کرتی ہوں کہ مسمی <span id="affidavit_student" class="font-bold">----</span> بن <span id="affidavit_parent" class="font-bold">----</span> کے داخلہ فارم میں اس کی تاریخ پیدائش اور عمر سمیت جو دیگر کوائف درج کئے گئے ہیں وہ میرے علم کے مطابق بالکل درست ہیں اور اس میں کوئی غلط بیانی نہیں کی گئی۔
+                </td>
+            </tr>
+
+            <!-- دستخط -->
+            <tr>
+                <td class="text-right pt-4 pb-2 font-bold text-xl">دستخط سرپرست</td>
+                <td colspan="2" class="text-right pt-4 pb-2 font-bold text-xl">دستخط طالب علم</td>
+            </tr>
+            
+            <!-- شناختی کارڈ -->
+            <tr>
+                <td class="text-center py-3 font-bold text-xl">قومی شناختی کارڈ نمبر / ب فارم</td>
+                <td colspan="2" class="text-center font-bold text-2xl font-sans tracking-widest" id="lbl_idNumber">----</td>
+            </tr>
+
+            <!-- دفتری استعمال ہیڈنگ -->
+            <tr>
+                <td colspan="3" class="text-center font-bold text-2xl py-2">دفتری استعمال کے لئے</td>
+            </tr>
+            <!-- دفتری استعمال تاریخیں -->
+            <tr>
+                <td class="text-center py-3">
+                    <div class="flex justify-center gap-4">
+                        <span>تاریخ داخلہ:</span> 
+                        <span id="lbl_admissionDate" class="font-bold font-sans">----</span>
+                    </div>
+                </td>
+                <td colspan="2" class="text-center py-3">
+                    <div class="flex justify-center gap-4">
+                        <span>اختتام داخلہ:</span> 
+                        <span id="lbl_endDate" class="font-bold font-sans">----</span>
+                    </div>
+                </td>
+            </tr>
+            <!-- دفتری استعمال نمبرز -->
+            <tr>
+                <td class="text-center py-3">
+                    <div class="flex justify-center gap-4">
+                        <span>رجسٹریشن نمبر:</span> 
+                        <span id="lbl_regNumberBottom" class="font-bold font-sans tracking-widest">----</span>
+                    </div>
+                </td>
+                <td colspan="2" class="text-center py-3">
+                    <div class="flex justify-center gap-4">
+                        <span>داخلہ نمبر:</span> 
+                        <span id="lbl_admissionNumber" class="font-bold font-sans">----</span>
+                    </div>
+                </td>
+            </tr>
+            <!-- مہتمم دستخط -->
+            <tr>
+                <td colspan="3" class="text-center pt-8 pb-4 font-bold text-xl">
+                    دستخط ناظم اعلیٰ / مہتمم / سربراہ: <span class="inline-block w-48 border-b-2 border-black border-dashed"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- جاوا اسکرپٹ (Supabase Integration) -->
+    <script type="module">
+        import { supabase } from './js/supabase.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // URL سے رجسٹریشن نمبر نکالیں (مثلاً ?reg=1448-37-000444)
+            const urlParams = new URLSearchParams(window.location.search);
+            const regNumber = urlParams.get('reg');
+
+            if (!regNumber) {
+                document.getElementById('loadingMessage').innerText = "غلطی: کوئی طالب علم منتخب نہیں کیا گیا۔ پچھلے پیج سے دوبارہ آئیں۔";
+                document.getElementById('loadingMessage').classList.replace('text-green-700', 'text-red-600');
+                return;
+            }
+
+            try {
+                // Supabase سے ریکارڈ منگوائیں
+                const { data, error } = await supabase
+                    .from('students')
+                    .select('*')
+                    .eq('reg_number', regNumber)
+                    .single();
+
+                if (error) throw error;
+
+                if (data) {
+                    // ڈیٹا کو HTML میں بھرنا
+                    
+                    // برانچ اور شعبہ
+                    document.getElementById('dynamicDepartment').innerText = data.department || (data.branch_type === 'girls' ? 'شعبہ بنات' : 'تحفیظ القرآن');
+                    document.getElementById('lbl_parentLabel').innerText = data.branch_type === 'girls' ? 'بنت:' : 'ولدیت:';
+
+                    // ہیڈر اور نمبرز
+                    document.getElementById('lbl_affiliateNumber').innerText = data.affiliate_number || '------';
+                    document.getElementById('lbl_regNumberTop').innerText = data.reg_number || '------';
+                    document.getElementById('lbl_regNumberBottom').innerText = data.reg_number || '------';
+                    document.getElementById('lbl_admissionNumber').innerText = data.admission_number || '------';
+
+                    // طالب علم کا نام اور ولدیت
+                    document.getElementById('lbl_studentName').innerText = data.student_name || '----';
+                    document.getElementById('lbl_parentName').innerText = data.parent_name || '----';
+                    
+                    // حلف نامہ کی اپڈیٹ
+                    document.getElementById('affidavit_student').innerText = data.student_name || '----';
+                    document.getElementById('affidavit_parent').innerText = data.parent_name || '----';
+                    document.getElementById('affidavit_guardian').innerText = data.guardian_name || data.parent_name || '----';
+
+                    // ذاتی معلومات
+                    document.getElementById('lbl_nationality').innerText = data.nationality || 'پاکستانی';
+                    document.getElementById('lbl_dob').innerText = data.dob ? data.dob.split('-').reverse().join('-') : '----';
+                    document.getElementById('lbl_education').innerText = data.education || '----';
+                    document.getElementById('lbl_residentialStatus').innerText = data.residential_status || '----';
+                    document.getElementById('lbl_guardianName').innerText = data.guardian_name || '----';
+                    document.getElementById('lbl_className').innerText = data.class_name || '----';
+                    
+                    // رابطے کی معلومات
+                    document.getElementById('lbl_phone').innerText = data.phone || '----';
+                    document.getElementById('lbl_guardianPhone').innerText = data.guardian_phone || '----';
+                    document.getElementById('lbl_permanentAddress').innerText = data.permanent_address || '----';
+                    document.getElementById('lbl_currentAddress').innerText = data.current_address || '----';
+                    document.getElementById('lbl_fatherProfession').innerText = data.father_profession || '----';
+
+                    // شناختی معلومات
+                    document.getElementById('lbl_idNumber').innerText = data.id_number_value || '----';
+                    document.getElementById('lbl_guardianRelation').innerText = data.guardian_relation || '----';
+
+                    // دفتری تاریخیں
+                    document.getElementById('lbl_admissionDate').innerText = data.admission_date ? data.admission_date.split('-').reverse().join('-') : '----';
+                    document.getElementById('lbl_endDate').innerText = data.end_date ? data.end_date.split('-').reverse().join('-') : '----';
+
+                    // تصویر سیٹ کرنا
+                    const photoEl = document.getElementById('lbl_studentPhoto');
+                    if (data.photo_url) {
+                        photoEl.src = data.photo_url;
+                    } else {
+                        // اگر تصویر نہ ہو تو نام کا پہلا حرف شو کریں
+                        photoEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.student_name || 'T')}&background=e5e7eb&color=374151&font-size=0.4`;
+                    }
+
+                    // لوڈنگ میسج غائب کریں اور فارم دکھائیں
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    document.getElementById('formContainer').style.display = 'block';
+                }
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                document.getElementById('loadingMessage').innerText = "ڈیٹا لانے میں خرابی: " + err.message;
+                document.getElementById('loadingMessage').classList.replace('text-green-700', 'text-red-600');
+            }
+        });
+    </script>
+</body>
+</html>

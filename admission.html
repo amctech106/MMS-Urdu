@@ -14,6 +14,13 @@
             font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
             background-color: #f3f4f6;
         }
+        /* تصویر کا پریویو دکھانے کے لیے */
+        #photoPreview {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -28,8 +35,14 @@
 
     <!-- داخلہ فارم کا مرکزی حصہ -->
     <main class="container mx-auto p-6 flex-grow flex justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-4xl border-t-4 border-green-700">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-4xl border-t-4 border-green-700 relative">
             
+            <!-- لوڈنگ اوورلے (ڈیٹا محفوظ ہوتے وقت) -->
+            <div id="loadingOverlay" class="absolute inset-0 bg-white bg-opacity-80 z-50 flex-col items-center justify-center hidden rounded-lg">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-green-700 mb-4"></div>
+                <h2 class="text-2xl font-bold text-green-800">ڈیٹا اور تصویر محفوظ کی جا رہی ہے... براہ کرم انتظار کریں۔</h2>
+            </div>
+
             <!-- ہیڈر سیکشن (صرف ٹیکسٹ، بالکل سینٹر میں) -->
             <div class="text-center mb-6 border-b-2 border-gray-200 pb-6 pt-2">
                 <h2 class="text-3xl font-bold text-green-800">دارالعلوم جامعہ نعیمیہ - داخلہ فارم برائے <span id="branchTitleDisplay">بنین</span></h2>
@@ -40,10 +53,11 @@
                 
                 <!-- تصویر کا باکس (فارم کے اندر سب سے اوپر بائیں طرف) -->
                 <div class="md:col-span-2 flex justify-end mb-2">
-                    <div class="flex flex-col items-center w-32 bg-gray-50 p-2 border rounded-md shadow-sm">
-                        <div class="w-24 h-28 bg-gray-200 border-2 border-dashed border-gray-400 flex items-center justify-center text-gray-500 rounded mb-2 text-xs text-center">
+                    <div class="flex flex-col items-center w-32 bg-gray-50 p-2 border rounded-md shadow-sm relative overflow-hidden">
+                        <div id="photoPlaceholder" class="w-24 h-28 bg-gray-200 border-2 border-dashed border-gray-400 flex items-center justify-center text-gray-500 rounded mb-2 text-xs text-center">
                             تصویر یہاں<br>آئے گی
                         </div>
+                        <img id="photoPreview" class="w-24 h-28 rounded mb-2 border border-gray-300">
                         <input type="file" id="studentPhoto" accept="image/*" class="text-[10px] w-full cursor-pointer">
                     </div>
                 </div>
@@ -74,8 +88,18 @@
 
                 <!-- تعلیمی قابلیت -->
                 <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">تعلیمی قابلیت:</label>
+                    <label class="block text-lg font-semibold text-gray-700 mb-1">تعلیمی قابلیت (علوم عصریہ):</label>
                     <input type="text" id="education" class="w-full px-4 py-2 border rounded-md bg-gray-50">
+                </div>
+
+                <!-- رہائش کی نوعیت (نیا اضافہ) -->
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-1">رہائش کی نوعیت:</label>
+                    <select id="residentialStatus" class="w-full px-4 py-2 border rounded-md bg-gray-50" required>
+                        <option value="">منتخب کریں...</option>
+                        <option value="رہائشی">رہائشی</option>
+                        <option value="غیر رہائشی">غیر رہائشی</option>
+                    </select>
                 </div>
 
                 <!-- ضامن / سرپرست کا نام -->
@@ -84,21 +108,16 @@
                     <input type="text" id="guardianName" class="w-full px-4 py-2 border rounded-md bg-gray-50">
                 </div>
 
-                <!-- درجہ -->
+                <!-- درجہ (نیا اضافہ / اپڈیٹ) -->
                 <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">درجہ:</label>
-                    <select id="classSelect" class="w-full px-4 py-2 border rounded-md bg-gray-50">
+                    <label class="block text-lg font-semibold text-gray-700 mb-1 text-red-600">الدرجہ:</label>
+                    <select id="classSelect" class="w-full px-4 py-2 border rounded-md bg-gray-50" required>
                         <option value="">درجہ منتخب کریں...</option>
-                        <option value="تجوید سال اول">تجوید سال اول</option>
+                        <option value="قاری محمد اسحاق (ناظرہ)">قاری محمد اسحاق (ناظرہ)</option>
                         <option value="تحفیظ القرآن">تحفیظ القرآن</option>
+                        <option value="تجوید سال اول">تجوید سال اول</option>
                         <option value="عالمہ / عالم سال اول">عالمہ / عالم سال اول</option>
                     </select>
-                </div>
-
-                <!-- رجسٹریشن نمبر -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">رجسٹریشن نمبر:</label>
-                    <input type="text" id="regNumber" class="w-full px-4 py-2 border rounded-md bg-gray-50" placeholder="خودکار یا دستی">
                 </div>
 
                 <!-- رابطہ نمبر -->
@@ -131,19 +150,12 @@
                     <input type="text" id="fatherProfession" class="w-full px-4 py-2 border rounded-md bg-gray-50">
                 </div>
 
-                <!-- نام گواہ -->
+                <!-- سرپرست سے رشتہ -->
                 <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">نام گواہ:</label>
-                    <input type="text" id="witnessName" class="w-full px-4 py-2 border rounded-md bg-gray-50">
+                    <label class="block text-lg font-semibold text-gray-700 mb-1">سرپرست سے رشتہ:</label>
+                    <input type="text" id="guardianRelation" class="w-full px-4 py-2 border rounded-md bg-gray-50">
                 </div>
 
-                <!-- بن -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">بن:</label>
-                    <input type="text" id="witnessParent" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-
-                
                 <!-- شناختی کارڈز اور ب فارم (ریڈیو بٹن کے ساتھ) -->
                 <div class="md:col-span-2 bg-gray-50 p-4 rounded-lg border space-y-3">
                     <label class="block text-lg font-semibold text-gray-700">شناخت کی نوعیت (کوئی ایک منتخب کریں):</label>
@@ -151,11 +163,11 @@
                     <div class="flex flex-col md:flex-row gap-4">
                         <label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
                             <input type="radio" name="idType" value="student_cnic" class="w-4 h-4 text-green-600">
-                            <span>طالب علم کا قومی شناختی کارڈ نمبر</span>
+                            <span>طالب علم کا شناختی کارڈ</span>
                         </label>
                         <label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
                             <input type="radio" name="idType" value="guardian_cnic" class="w-4 h-4 text-green-600">
-                            <span>والد یا سرپرست کا قومی شناختی کارڈ نمبر</span>
+                            <span>والد یا سرپرست کا شناختی کارڈ</span>
                         </label>
                         <label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
                             <input type="radio" name="idType" value="b_form" class="w-4 h-4 text-green-600" checked>
@@ -167,41 +179,29 @@
                         <input type="text" id="idNumberValue" class="w-full px-4 py-2 border rounded-md bg-white mt-2" placeholder="منتخب کردہ شناختی کارڈ یا ب فارم کا نمبر درج کریں...">
                     </div>
                 </div>
-                
-                <!-- سرپرست سے رشتہ -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">سرپرست سے رشتہ:</label>
-                    <input type="text" id="guardianRelation" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-                
-                
-                <!-- تاریخِ داخلہ -->
+
+                <!-- دفتری استعمال: تاریخِ داخلہ -->
                 <div>
                     <label class="block text-lg font-semibold text-gray-700 mb-1">تاریخِ داخلہ:</label>
                     <input type="date" id="admissionDate" class="w-full px-4 py-2 border rounded-md bg-gray-50">
                 </div>
-                
-                <!-- اختتامِ داخلہ -->
+
+                <!-- دفتری استعمال: اختتامِ داخلہ -->
                 <div>
                     <label class="block text-lg font-semibold text-gray-700 mb-1">اختتامِ داخلہ (سیشن):</label>
                     <input type="date" id="endDate" class="w-full px-4 py-2 border rounded-md bg-gray-50">
                 </div>
-                
+
                 <!-- داخلہ نمبر -->
                 <div>
                     <label class="block text-lg font-semibold text-gray-700 mb-1">داخلہ نمبر:</label>
                     <input type="text" id="admissionNumber" class="w-full px-4 py-2 border rounded-md bg-gray-50">
                 </div>
-                
-                <!-- دستخط سرپرست -->
+
+                <!-- رجسٹریشن نمبر -->
                 <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">دستخط سرپرست:</label>
-                    <input type="text" id="guardianSignature" class="w-full px-4 py-2 border rounded-md bg-gray-50">
-                </div>
-                <!-- دستخط ناظم اعلیٰ / مہتمم / سربراہ -->
-                <div>
-                    <label class="block text-lg font-semibold text-gray-700 mb-1">دستخط ناظم اعلیٰ / مہتمم / سربراہ:</label>
-                    <input type="text" id="principalSignature" class="w-full px-4 py-2 border rounded-md bg-gray-50">
+                    <label class="block text-lg font-semibold text-gray-700 mb-1">رجسٹریشن نمبر:</label>
+                    <input type="text" id="regNumber" class="w-full px-4 py-2 border rounded-md bg-gray-50" placeholder="اگر خالی چھوڑا تو خودکار بنے گا">
                 </div>
 
                 <!-- بٹنز -->
@@ -213,58 +213,133 @@
         </div>
     </main>
 
-    <!-- جاوا اسکرپٹ -->
     <script type="module">
         import { supabase } from './js/supabase.js';
 
+        // برانچ کی سیٹنگ
+        let activeBranch = 'central';
+        let departmentName = 'تحفیظ القرآن';
+
         document.addEventListener('DOMContentLoaded', () => {
-            const activeBranch = localStorage.getItem('activeBranch') || 'central';
+            activeBranch = localStorage.getItem('activeBranch') || 'central';
             const branchTitleDisplay = document.getElementById('branchTitleDisplay');
             
             if(activeBranch === 'girls') {
                 branchTitleDisplay.innerText = 'شعبہ بنات';
+                departmentName = 'شعبہ بنات';
                 document.querySelectorAll('.student-label').forEach(el => el.innerText = 'طالبہ');
                 document.querySelectorAll('.parent-label').forEach(el => el.innerText = 'بنت');
             } else {
                 branchTitleDisplay.innerText = 'بنین (مرکزی)';
+                departmentName = 'تحفیظ القرآن';
             }
         });
 
+        // تصویر منتخب کرنے پر فارم میں پریویو دکھانا
+        const photoInput = document.getElementById('studentPhoto');
+        const photoPreview = document.getElementById('photoPreview');
+        const photoPlaceholder = document.getElementById('photoPlaceholder');
+
+        photoInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoPreview.src = e.target.result;
+                    photoPreview.style.display = 'block';
+                    photoPlaceholder.style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // فارم جمع کرانا (Submit)
         document.getElementById('admissionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-
-            const studentName = document.getElementById('studentName').value;
-            const parentName = document.getElementById('parentName').value;
-            const branchType = localStorage.getItem('activeBranch') || 'central';
-            const parentRelation = (branchType === 'girls') ? 'بنت' : 'ولد';
-            const regNumber = document.getElementById('regNumber').value || ('REG-' + new Date().getTime());
-            const phone = document.getElementById('phone').value;
-            const permanentAddress = document.getElementById('permanentAddress').value;
+            
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.style.display = 'flex'; // لوڈنگ شو کریں
 
             try {
-                const { data, error } = await supabase
-                    .from('students')
-                    .insert([
-                        {
-                            reg_number: regNumber,
-                            branch_type: branchType,
-                            student_name: studentName,
-                            parent_relation: parentRelation,
-                            parent_name: parentName,
-                            phone: phone,
-                            permanent_address: permanentAddress,
-                            status: 'داخل شدہ'
-                        }
-                    ]);
+                // 1. تصویر اپلوڈ کرنے کا مرحلہ
+                let uploadedPhotoUrl = null;
+                const file = photoInput.files[0];
 
-                if (error) {
-                    alert('ڈیٹا محفوظ کرنے میں مسئلہ: ' + error.message);
-                } else {
-                    alert('طالب علم کا داخلہ فارم کامیابی سے محفوظ ہو گیا ہے!');
-                    document.getElementById('admissionForm').reset();
+                if (file) {
+                    // فائل کا منفرد نام بنائیں تاکہ پرانی فائل ری پلیس نہ ہو
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+                    // Supabase Storage میں 'student-photos' نامی بالٹی (Bucket) میں اپلوڈ کریں
+                    const { data: uploadData, error: uploadError } = await supabase
+                        .storage
+                        .from('student-photos')
+                        .upload(fileName, file);
+
+                    if (uploadError) throw new Error("تصویر اپلوڈ کرنے میں مسئلہ: " + uploadError.message);
+
+                    // اپلوڈ ہونے کے بعد پبلک URL حاصل کریں
+                    const { data: publicUrlData } = supabase
+                        .storage
+                        .from('student-photos')
+                        .getPublicUrl(fileName);
+                        
+                    uploadedPhotoUrl = publicUrlData.publicUrl;
                 }
+
+                // 2. ڈیٹا بیس میں فیلڈز محفوظ کرنے کا مرحلہ
+                const branchType = activeBranch;
+                const regNumber = document.getElementById('regNumber').value || ('REG-' + new Date().getTime()); // خودکار رجسٹریشن نمبر
+                
+                // منتخب شدہ ریڈیو بٹن کی ویلیو نکالنا
+                const selectedIdType = document.querySelector('input[name="idType"]:checked').value;
+
+                const studentData = {
+                    reg_number: regNumber,
+                    admission_number: document.getElementById('admissionNumber').value,
+                    student_name: document.getElementById('studentName').value,
+                    parent_name: document.getElementById('parentName').value,
+                    nationality: document.getElementById('nationality').value,
+                    dob: document.getElementById('dob').value,
+                    education: document.getElementById('education').value,
+                    residential_status: document.getElementById('residentialStatus').value,
+                    guardian_name: document.getElementById('guardianName').value,
+                    class_name: document.getElementById('classSelect').value,
+                    phone: document.getElementById('phone').value,
+                    guardian_phone: document.getElementById('guardianPhone').value,
+                    permanent_address: document.getElementById('permanentAddress').value,
+                    current_address: document.getElementById('currentAddress').value,
+                    father_profession: document.getElementById('fatherProfession').value,
+                    guardian_relation: document.getElementById('guardianRelation').value,
+                    id_type: selectedIdType,
+                    id_number_value: document.getElementById('idNumberValue').value,
+                    admission_date: document.getElementById('admissionDate').value,
+                    end_date: document.getElementById('endDate').value,
+                    branch_type: branchType,
+                    department: departmentName,
+                    photo_url: uploadedPhotoUrl,
+                    status: 'داخل شدہ' // بائی ڈیفالٹ سٹیٹس
+                };
+
+                const { error: dbError } = await supabase
+                    .from('students')
+                    .insert([studentData]);
+
+                if (dbError) throw new Error("ڈیٹا بیس میں محفوظ کرنے میں مسئلہ: " + dbError.message);
+
+                // سب کچھ کامیابی سے ہو گیا
+                loadingOverlay.style.display = 'none';
+                alert('طالب علم کا داخلہ کامیابی سے مکمل ہو گیا ہے!');
+                
+                // فارم ری سیٹ کریں
+                document.getElementById('admissionForm').reset();
+                photoPreview.style.display = 'none';
+                photoPreview.src = '';
+                photoPlaceholder.style.display = 'flex';
+
             } catch (err) {
-                alert('سسٹم میں خرابی پیش آئی۔');
+                loadingOverlay.style.display = 'none';
+                alert(err.message);
             }
         });
     </script>

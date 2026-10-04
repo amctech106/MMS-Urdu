@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داخل شدہ طلباء کی رپورٹ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'JameelNooriNastaleeq';
+            src: url('./fonts/Jameel\ Noori\ Nastaleeq.ttf') format('truetype');
+        }
+        body {
+            font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* ٹیبل کی سیٹنگز تصویر کے مطابق */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: 1px solid #4b5563;
+        }
+        th, td {
+            border: 1px solid #4b5563;
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        th {
+            background-color: black;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: normal;
+        }
+        /* گرے بیک گراؤنڈ والے خانے */
+        .bg-gray-cell {
+            background-color: #e5e7eb;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- ٹاپ نیویگیشن (ڈیش بورڈ پر واپس جانے کے لیے) -->
+    <nav class="bg-green-700 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">داخل شدہ طلباء کی رپورٹ</h1>
+            <a href="dashboard.html" class="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 transition font-bold">واپس ڈیش بورڈ</a>
+        </div>
+    </nav>
+
+    <!-- مین کنٹینر -->
+    <main class="container mx-auto p-6 flex-grow">
+        <div class="bg-white p-8 rounded-lg shadow-xl border-t-4 border-green-700">
+            
+            <!-- ہدایاتی جملہ -->
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">کسی بھی طالب علم کی داخلہ فارم نکالنے کے لئے اس کے داخلہ فارم کے لنک پر کلک کریں۔</h2>
+            </div>
+
+            <!-- فلٹرز کا سیکشن -->
+            <div class="flex flex-wrap justify-center items-center gap-6 mb-6">
+                <!-- درجہ منتخب کریں -->
+                <div class="flex items-center gap-2">
+                    <label class="text-lg font-bold">درجہ منتخب کریں</label>
+                    <select id="classFilter" class="px-4 py-1 border border-gray-400 rounded w-48 bg-white">
+                        <option value="">منتخب کریں...</option>
+                        <option value="تجوید">تجوید</option>
+                        <option value="ناظرہ">ناظرہ</option>
+                    </select>
+                </div>
+
+                <!-- تاریخ سے -->
+                <div class="flex items-center gap-2">
+                    <label class="text-lg font-bold">تاریخ سے</label>
+                    <input type="date" id="fromDate" value="2026-10-03" class="px-4 py-1 border border-gray-400 rounded bg-white">
+                </div>
+
+                <!-- تاریخ تک -->
+                <div class="flex items-center gap-2">
+                    <label class="text-lg font-bold">تاریخ تک</label>
+                    <input type="date" id="toDate" value="2027-10-04" class="px-4 py-1 border border-gray-400 rounded bg-white">
+                </div>
+
+                <!-- تلاش کا بٹن -->
+                <div>
+                    <button class="bg-[#0f172a] text-white px-6 py-1.5 font-bold hover:bg-gray-800 transition rounded border border-gray-500 shadow">
+                        تلاش کریں
+                    </button>
+                </div>
+            </div>
+
+            <!-- طلباء کا ٹیبل -->
+            <div class="overflow-x-auto mt-4">
+                <table id="registeredStudentsTable">
+                    <thead>
+                        <tr>
+                            <th class="w-16">نمبر شمار</th>
+                            <th class="w-48">اسم الطالب</th>
+                            <th class="w-32">رجسٹریشن نمبر</th>
+                            <th class="w-28">تاریخ پیدائش</th>
+                            <th class="w-20">رول نمبر</th>
+                            <th>مستقل پتہ</th>
+                            <th class="bg-gray-cell text-black font-bold border-black w-32">درجہ</th>
+                            <th class="w-28">داخلہ فارم</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- ڈیمو ریکارڈ (بالکل تصویر جیسا) -->
+                        <tr>
+                            <td class="bg-gray-cell">1</td>
+                            <td class="bg-gray-cell text-lg">محسن ولد عبدالغفار</td>
+                            <td class="bg-gray-cell text-blue-600 tracking-wider font-sans"><a href="#" class="hover:underline">1448-37-000444</a></td>
+                            <td class="bg-gray-cell font-sans">16-07-2013</td>
+                            <td class="bg-gray-cell font-sans">728</td>
+                            <td class="bg-gray-cell text-base leading-relaxed text-right">
+                                مکان نمبر ایل 258، گلی نمبر 13، مچھر کالونی، اسکیم 33، گڈاپ ٹاؤن بلاک سی کراچی شرقی
+                            </td>
+                            <td class="bg-gray-cell font-bold text-lg leading-tight">
+                                قاری محمد اسحاق<br>(ناظرہ)
+                            </td>
+                            <td class="bg-gray-cell">
+                                <!-- یہاں ہم نے print_form.html کا لنک دیا ہے -->
+                                <a href="print_form.html?reg=1448-37-000444" class="text-blue-600 text-lg hover:underline font-bold">داخلہ فارم</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

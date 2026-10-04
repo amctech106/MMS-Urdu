@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تلاش کیجیے - مدرسہ مینجمنٹ سسٹم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @font-face {
+        font-family: "JameelNooriNastaleeq";
+        src: url("./fonts/Jameel\ Noori\ Nastaleeq.ttf") format("truetype");
+      }
+      body {
+        font-family: "JameelNooriNastaleeq", Arial, sans-serif;
+        background-color: #f3f4f6;
+      }
+      /* ٹیبل کی خوبصورتی کے لیے CSS */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #e5e7eb;
+        padding: 12px;
+        text-align: right;
+        vertical-align: middle;
+      }
+      th {
+        background-color: #15803d; /* سبز رنگ */
+        color: white;
+        font-size: 1.1rem;
+      }
+      tr:nth-child(even) {
+        background-color: #f9fafb;
+      }
+      tr:hover {
+        background-color: #f3f4f6;
+      }
+    </style>
+  </head>
+  <body class="flex flex-col min-h-screen">
+    <!-- ٹاپ نیویگیشن -->
+    <nav class="bg-green-700 text-white p-4 shadow-md">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold">طلباء کا ریکارڈ تلاش کریں</h1>
+        <a
+          href="dashboard.html"
+          class="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 transition font-bold"
+          >واپس ڈیش بورڈ</a
+        >
+      </div>
+    </nav>
+
+    <!-- سرچ کا مرکزی حصہ -->
+    <main class="container mx-auto p-6 flex-grow">
+      <div
+        class="bg-white p-8 rounded-lg shadow-xl border-t-4 border-green-700"
+      >
+        <div class="mb-6 flex flex-col md:flex-row gap-4 items-center">
+          <!-- سرچ انپٹ -->
+          <div class="w-full relative">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="طالب علم کا نام، رجسٹریشن نمبر، یا فون نمبر لکھ کر تلاش کریں..."
+              class="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 text-lg bg-gray-50"
+            />
+          </div>
+        </div>
+
+        <!-- طلباء کا ریکارڈ (ٹیبل) -->
+        <div class="overflow-x-auto">
+          <table id="studentsTable">
+            <thead>
+              <tr>
+                <th class="w-16 text-center">تصویر</th>
+                <th>رجسٹریشن نمبر</th>
+                <th>نام طالب علم</th>
+                <th>ولدیت / بنت</th>
+                <th>فون نمبر</th>
+                <th>مستقل پتا</th>
+                <th>درجہ</th>
+                <th>رہائشی /غیررہائشی</th>
+                <th>سٹیٹس</th>
+                <th>ایکشن</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- جاوا اسکرپٹ کے ذریعے ڈیٹا بیس کا ریکارڈ یہاں لوڈ ہوگا -->
+              <tr>
+                <!-- کالمز کی تعداد 7 سے بڑھا کر 8 کر دی گئی ہے -->
+                <td colspan="8" class="text-center text-gray-500 py-6 text-lg">
+                  ڈیٹا بیس سے ریکارڈ لوڈ ہو رہا ہے، براہ کرم انتظار کریں...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- جاوا اسکرپٹ (Supabase Integration) -->
+    <script type="module">
+      import { supabase } from "./js/supabase.js";
+
+      const tableBody = document.getElementById("tableBody");
+      const searchInput = document.getElementById("searchInput");
+      let allStudents = [];
+
+      // 1. ڈیٹا بیس سے تمام طلباء کا ریکارڈ منگوانا
+      async function fetchStudents() {
+        try {
+          // لوکل اسٹوریج سے برانچ معلوم کریں
+          const activeBranch =
+            localStorage.getItem("activeBranch") || "central";
+
+          // Supabase سے ڈیٹا نکالیں
+          const { data, error } = await supabase
+            .from("students")
+            .select("*")
+            .eq("branch_type", activeBranch)
+            .order("created_at", { ascending: false });
+
+          if (error) throw error;
+
+          allStudents = data;
+          displayStudents(allStudents);
+        } catch (err) {
+          console.error("Error fetching students:", err);
+          tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-red-500 py-4">ڈیٹا لوڈ کرنے میں مسئلہ پیش آیا۔ انٹرنیٹ کنکشن چیک کریں۔</td></tr>`;
+        }
+      }
+
+      // 2. ریکارڈ کو ٹیبل میں دکھانا
+      function displayStudents(students) {
+        tableBody.innerHTML = "";
+
+        if (students.length === 0) {
+          tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-gray-500 py-4">کوئی ریکارڈ نہیں ملا۔</td></tr>`;
+          return;
+        }
+
+        students.forEach((student) => {
+          // تصویر کا یو آر ایل چیک کریں، اگر نہ ہو تو نام سے خوبصورت گول لوگو بنائیں
+          const nameStr = student.student_name || "T";
+          const photoUrl = student.photo_url
+            ? student.photo_url
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(nameStr)}&background=15803d&color=fff&font-size=0.4&bold=true`;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+                    <td class="text-center">
+                        <img src="${photoUrl}" alt="${student.student_name}" class="w-12 h-12 rounded-full object-cover border-2 border-gray-300 shadow-sm mx-auto">
+                    </td>
+                    <td class="font-semibold text-gray-700">${student.reg_number || "-"}</td>
+                    <td class="font-bold text-green-700 text-lg">${student.student_name || "-"}</td>
+                    <td>${student.parent_name || "-"}</td>
+                    <td dir="ltr" class="text-right">${student.phone || "-"}</td>
+                    <td>${student.permanent_address || "-"}</td>
+            
+                    <td>${student.residential_status || "-"}</td> <!-- رہائش کی نوعیت کے لیے -->
+                    <td>${student.class_name || "-"}</td> <!-- درجہ کے لیے -->
+            
+
+                    <td><span class="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-bold">${student.status || "داخل شدہ"}</span></td>
+                    <td class="space-x-2 space-x-reverse min-w-[120px]">
+                        <button onclick="editStudent('${student.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-3 py-1 rounded text-sm transition shadow">ترمیم</button>
+                        <button onclick="deleteStudent('${student.id}')" class="bg-red-600 hover:bg-red-700 text-white font-bold px-3 py-1 rounded text-sm transition shadow">حذف</button>
+                    </td>
+                `;
+          tableBody.appendChild(tr);
+        });
+      }
+
+      // 3. سرچ کرنے کا فنکشن (Live Search)
+      searchInput.addEventListener("input", (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const filteredData = allStudents.filter((student) => {
+          const name = student.student_name
+            ? student.student_name.toLowerCase()
+            : "";
+          const regNo = student.reg_number
+            ? student.reg_number.toLowerCase()
+            : "";
+          const phone = student.phone ? student.phone : "";
+
+          return (
+            name.includes(searchTerm) ||
+            regNo.includes(searchTerm) ||
+            phone.includes(searchTerm)
+          );
+        });
+        displayStudents(filteredData);
+      });
+
+      // 4. حذف (Delete) کرنے کا فنکشن
+      window.deleteStudent = async function (id) {
+        if (
+          confirm(
+            "کیا آپ واقعی اس طالب علم کا ریکارڈ مکمل طور پر ڈیلیٹ کرنا چاہتے ہیں؟\nیہ عمل واپس نہیں ہو سکتا!",
+          )
+        ) {
+          try {
+            const { error } = await supabase
+              .from("students")
+              .delete()
+              .eq("id", id);
+
+            if (error) throw error;
+
+            alert("ریکارڈ کامیابی سے ڈیلیٹ ہو گیا۔");
+            fetchStudents();
+          } catch (err) {
+            alert("ڈیلیٹ کرنے میں مسئلہ: " + err.message);
+          }
+        }
+      };
+
+      // 5. ترمیم (Edit) کرنے کا فنکشن
+      window.editStudent = function (id) {
+        alert("ایڈٹ (ترمیم) کرنے والا فارم ہم اگلے مرحلے میں بنائیں گے!");
+      };
+
+      // پیج لوڈ ہوتے ہی تمام طلباء کا ڈیٹا منگوائیں
+      document.addEventListener("DOMContentLoaded", fetchStudents);
+    </script>
+  </body>
+</html>
