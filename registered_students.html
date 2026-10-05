@@ -93,11 +93,11 @@
                     <thead>
                         <tr>
                             <th class="w-16">نمبر شمار</th>
-                            <th class="w-48">اسم الطالب</th>
+                            <th class="w-48">نام طالب علم</th>
                             <th class="w-32">رجسٹریشن نمبر</th>
                             <th class="w-28">تاریخ پیدائش</th>
                             <th class="w-20">داخلہ نمبر</th>
-                            <th>مستقل پتہ</th>
+                            <th>مستقل پتا</th>
                             <th class="bg-gray-cell text-black font-bold border-black w-32">درجہ</th>
                             <th class="w-28">داخلہ فارم</th>
                         </tr>
@@ -168,9 +168,11 @@
                     <td class="bg-gray-cell font-sans">${student.admission_number || '-'}</td>
                     <td class="bg-gray-cell text-base leading-relaxed text-right">${student.permanent_address || '-'}</td>
                     <td class="bg-gray-cell font-bold text-lg leading-tight text-red-600">${student.class_name || '-'}</td>
-                    <td class="bg-gray-cell flex flex-col gap-1 items-center justify-center">
-    <a href="print_form.html?reg=${student.reg_number}" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition">فارم پرنٹ</a>
-    <a href="id_card.html?reg=${student.reg_number}" class="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 transition">ID کارڈ</a>
+                   <td class="bg-gray-cell flex gap-1 items-center justify-center p-2">
+    <button onclick="editStudent('${student.reg_number}')" class="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600 transition font-bold">ایڈٹ</button>
+    <button onclick="deleteStudent('${student.reg_number}')" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition font-bold">ڈیلیٹ</button>
+    <a href="print_form.html?reg=${student.reg_number}" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition font-bold">فارم</a>
+    <a href="id_card.html?reg=${student.reg_number}" class="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 transition font-bold">کارڈ</a>
 </td>
                 `;
                 tableBody.appendChild(tr);
@@ -205,6 +207,34 @@
 
         // پیج لوڈ ہوتے ہی فنکشن چلانا
         document.addEventListener('DOMContentLoaded', fetchRegisteredStudents);
+        // ڈیلیٹ کرنے کا فنکشن
+    window.deleteStudent = async function(regNumber) {
+        const confirmDelete = confirm(`کیا آپ واقعی رجسٹریشن نمبر ${regNumber} کا ریکارڈ ڈیلیٹ کرنا چاہتے ہیں؟ یہ عمل واپس نہیں ہو سکے گا۔`);
+        
+        if(confirmDelete) {
+            try {
+                // Supabase سے ریکارڈ ہمیشہ کے لیے حذف کرنا
+                const { error } = await supabase
+                    .from('students')
+                    .delete()
+                    .eq('reg_number', regNumber);
+                    
+                if (error) throw error;
+                
+                alert('طالب علم کا ریکارڈ کامیابی سے ڈیلیٹ ہو گیا ہے۔');
+                window.location.reload(); // پیج ریفریش تاکہ لسٹ اپڈیٹ ہو جائے
+                
+            } catch (err) {
+                alert('ریکارڈ ڈیلیٹ کرنے میں مسئلہ آیا: ' + err.message);
+            }
+        }
+    };
+
+    // ایڈٹ کرنے کا فنکشن
+    window.editStudent = function(regNumber) {
+        // ایڈٹ کے لیے ہم یوزر کو داخلہ فارم پر بھیجیں گے جہاں اس کا پرانا ڈیٹا خود فل ہو جائے گا
+        window.location.href = `admission.html?edit=${regNumber}`;
+    };
 
     </script>
 </body>
