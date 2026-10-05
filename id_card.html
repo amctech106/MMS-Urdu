@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طالب علم کا شناختی کارڈ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'JameelNooriNastaleeq';
+            src: url('./fonts/Jameel\ Noori\ Nastaleeq.ttf') format('truetype');
+        }
+        body {
+            font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* پرنٹنگ کی سیٹنگ تاکہ صرف کارڈ پرنٹ ہو، باقی چیزیں غائب ہو جائیں */
+        @media print {
+            body {
+                background-color: white;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-container {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                margin-top: 0;
+            }
+        }
+        /* کارڈ کا سائز (Vertical Standard ID Card) */
+        .id-card {
+            width: 2.125in;
+            height: 3.375in;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+            position: relative;
+            border: 1px solid #ccc;
+        }
+        /* کارڈ کے پس منظر کا ڈیزائن */
+        .card-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/arabesque.png'); /* ہلکا سا اسلامی پیٹرن */
+            opacity: 0.05;
+            z-index: 0;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body class="flex flex-col min-h-screen items-center py-10">
+
+    <!-- پرنٹ اور واپس جانے کے بٹنز (پرنٹ میں نظر نہیں آئیں گے) -->
+    <div class="no-print mb-8 flex gap-4">
+        <a href="registered_students.html" class="bg-gray-600 text-white px-6 py-2 rounded shadow hover:bg-gray-700 transition font-bold text-lg">واپس جائیں</a>
+        <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700 transition font-bold text-lg">کارڈ پرنٹ کریں</button>
+    </div>
+
+    <!-- لوڈنگ میسج -->
+    <div id="loadingMsg" class="text-xl font-bold text-green-700 mb-4">کارڈ کا ڈیٹا لوڈ ہو رہا ہے...</div>
+
+    <!-- ایرر میسج -->
+    <div id="errorMsg" class="text-xl font-bold text-red-600 mb-4 hidden"></div>
+
+    <!-- کارڈ کا کنٹینر (پرنٹنگ کے لیے) -->
+    <div id="cardContainer" class="print-container hidden gap-6 flex-wrap justify-center">
+        
+        <!-- کارڈ کا اگلا حصہ (Front Side) -->
+        <div class="id-card flex flex-col relative">
+            <div class="card-bg"></div>
+            
+            <!-- ہیڈر -->
+            <div class="bg-green-700 text-white text-center py-2 z-10">
+                <h2 class="text-[13px] font-bold leading-tight">دارالعلوم جامعہ نعیمیہ</h2>
+                <p class="text-[9px]">فیڈرل بی ایریا، کراچی</p>
+            </div>
+
+            <!-- طالب علم کی تصویر -->
+            <div class="flex justify-center mt-3 z-10">
+                <div class="w-16 h-20 border-2 border-green-700 bg-gray-200 overflow-hidden rounded">
+                    <img id="cardPhoto" src="" alt="Photo" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <!-- طالب علم کا ڈیٹا -->
+            <div class="px-3 mt-2 z-10 text-center flex-grow">
+                <h3 id="cardName" class="text-[16px] font-bold text-gray-900 leading-tight">------</h3>
+                <p class="text-[11px] text-gray-700 mt-1">ولد: <span id="cardParentName" class="font-bold">------</span></p>
+                
+                <div class="mt-2 text-[10px] text-right bg-green-50 p-1 border border-green-200 rounded">
+                    <p class="mb-0.5"><span class="font-bold text-green-800">درجہ:</span> <span id="cardClass">------</span></p>
+                    <p class="mb-0.5"><span class="font-bold text-green-800">رجسٹریشن:</span> <span id="cardRegNum" class="font-sans">------</span></p>
+                    <p><span class="font-bold text-green-800">شعبہ:</span> <span id="cardBranch">------</span></p>
+                </div>
+            </div>
+
+            <!-- فوٹر -->
+            <div class="bg-gray-800 text-white text-center py-1 z-10 text-[9px]">
+                شناختی کارڈ برائے طالب علم
+            </div>
+        </div>
+
+        <!-- کارڈ کا پچھلا حصہ (Back Side) -->
+        <div class="id-card flex flex-col relative justify-center">
+            <div class="card-bg"></div>
+            <div class="z-10 px-4 text-center">
+                <h3 class="text-[12px] font-bold text-green-800 border-b border-green-300 pb-1 mb-2">ہدایات برائے طلباء</h3>
+                <ul class="text-[9px] text-right list-disc pr-3 space-y-1 text-gray-800 mb-3">
+                    <li>یہ کارڈ مدرسے کی ملکیت ہے۔</li>
+                    <li>دورانِ تعلیم کارڈ ہمراہ رکھنا لازمی ہے۔</li>
+                    <li>گم ہونے کی صورت میں دفتر کو فوراً مطلع کریں۔</li>
+                    <li>گمشدگی پر نیا کارڈ بنوانے کی فیس ادا کرنی ہوگی۔</li>
+                </ul>
+                <div class="border-t border-gray-300 pt-2 text-[10px]">
+                    <p class="font-bold text-gray-900">رابطہ / فون:</p>
+                    <p class="font-sans">021-34567890</p>
+                </div>
+            </div>
+                <!-- کیو آر کوڈ کی جگہ -->
+<div class="mt-2 flex justify-center">
+    <div id="qrcode" class="p-1 bg-white border border-gray-300 rounded shadow-sm"></div>
+</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- جاوا اسکرپٹ -->
+    <script type="module">
+        import { supabase } from './js/supabase.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // URL سے رجسٹریشن نمبر حاصل کرنا (مثلاً ?reg=REG-12345)
+            const urlParams = new URLSearchParams(window.location.search);
+            const regNumber = urlParams.get('reg');
+
+            if (!regNumber) {
+                document.getElementById('loadingMsg').classList.add('hidden');
+                const errMsg = document.getElementById('errorMsg');
+                errMsg.innerText = "طالب علم کا رجسٹریشن نمبر نہیں ملا۔ براہ کرم لسٹ سے دوبارہ کلک کریں۔";
+                errMsg.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // Supabase سے طالب علم کا ڈیٹا لانا
+                const { data, error } = await supabase
+                    .from('students')
+                    .select('*')
+                    .eq('reg_number', regNumber)
+                    .single();
+
+                if (error || !data) throw new Error("ڈیٹا بیس میں یہ طالب علم نہیں ملا!");
+
+                // کارڈ میں ڈیٹا بھرنا
+                document.getElementById('cardName').innerText = data.student_name || '------';
+                document.getElementById('cardParentName').innerText = data.parent_name || '------';
+                document.getElementById('cardClass').innerText = data.class_name || '------';
+                document.getElementById('cardRegNum').innerText = data.reg_number || '------';
+                
+                // برانچ کا نام اردو میں لکھنا
+                let branchUrdu = 'مرکزی شعبہ';
+                if(data.branch_type === 'girls') branchUrdu = 'شعبہ بنات';
+                else if(data.branch_type === 'other') branchUrdu = 'دیگر برانچز';
+                document.getElementById('cardBranch').innerText = branchUrdu;
+
+                // تصویر سیٹ کرنا (اگر تصویر نہ ہو تو ڈیفالٹ آئیکن لگا دیں)
+                const photoEl = document.getElementById('cardPhoto');
+                if (data.photo_url) {
+                    photoEl.src = data.photo_url;
+                } else {
+                    photoEl.src = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'; // ڈیفالٹ اوتار
+                }
+
+               
+             // لوڈنگ ختم کریں اور کارڈ دکھائیں
+             // کیو آر کوڈ جنریٹ کرنا (اس میں طالب علم کا رجسٹریشن نمبر محفوظ ہوگا)
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = ""; // پرانا کوڈ صاف کرنا
+                new QRCode(qrContainer, {
+                    text: data.reg_number, // اسکین کرنے پر یہ رجسٹریشن نمبر دکھائے گا
+                    width: 55, // کیو آر کوڈ کی چوڑائی
+                    height: 55, // کیو آر کوڈ کی لمبائی
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                document.getElementById('loadingMsg').classList.add('hidden');
+                document.getElementById('cardContainer').classList.remove('hidden');
+                document.getElementById('cardContainer').classList.add('flex');
+
+            } catch (err) {
+                document.getElementById('loadingMsg').classList.add('hidden');
+                const errMsg = document.getElementById('errorMsg');
+                errMsg.innerText = err.message;
+                errMsg.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -22,6 +22,7 @@
             object-fit: cover;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -262,23 +263,34 @@
 
             try {
                 // 1. تصویر اپلوڈ کرنے کا مرحلہ
+             // 1. تصویر اپلوڈ کرنے کا مرحلہ
                 let uploadedPhotoUrl = null;
                 const file = photoInput.files[0];
 
                 if (file) {
-                    // فائل کا منفرد نام بنائیں تاکہ پرانی فائل ری پلیس نہ ہو
-                    const fileExt = file.name.split('.').pop();
+                    // تصویر کو کمپریس (150KB) کرنے کی سیٹنگ
+                    const options = {
+                        maxSizeMB: 0.15, // 150 KB (0.15 MB)
+                        maxWidthOrHeight: 800, // تصویر کی زیادہ سے زیادہ چوڑائی یا لمبائی
+                        useWebWorker: true
+                    };
+                    
+                    // کمپریشن اپلائی کریں (یہ بڑی تصویر کو چھوٹا کر دے گا)
+                    const compressedFile = await imageCompression(file, options);
+
+                    // فائل کا منفرد نام بنائیں
+                    const fileExt = compressedFile.name.split('.').pop() || 'jpg';
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-                    // Supabase Storage میں 'student-photos' نامی بالٹی (Bucket) میں اپلوڈ کریں
+                    // Supabase میں کمپریس شدہ (چھوٹی) تصویر اپلوڈ کریں
                     const { data: uploadData, error: uploadError } = await supabase
                         .storage
                         .from('student-photos')
-                        .upload(fileName, file);
+                        .upload(fileName, compressedFile);
 
                     if (uploadError) throw new Error("تصویر اپلوڈ کرنے میں مسئلہ: " + uploadError.message);
 
-                    // اپلوڈ ہونے کے بعد پبلک URL حاصل کریں
+                    // پبلک URL حاصل کریں
                     const { data: publicUrlData } = supabase
                         .storage
                         .from('student-photos')

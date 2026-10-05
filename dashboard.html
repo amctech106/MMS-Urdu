@@ -32,10 +32,36 @@
                     <p class="text-gray-600">بلاک 15 فیڈرل بی ایریا کراچی پاکستان</p>
                 </div>
             </div>
-            <div class="text-left">
-                <span id="branchDisplay" class="bg-green-700 text-white px-4 py-1 rounded-full text-sm">مرکزی شعبہ</span>
-            </div>
+           <!-- لیفٹ سائیڈ (بائیں جانب) کا کنٹینر جس میں برانچ اور بیک اپ کے بٹنز ایک ساتھ ہیں -->
+<div class="flex items-center gap-3">
+    
+    <!-- بیک اپ کا بٹن -->
+    <button onclick="alert('ڈیٹا بیس کا بیک اپ لیا جا رہا ہے...')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow transition flex items-center font-bold text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        بیک اپ لیں
+    </button>
+
+    <!-- امپورٹ کا بٹن -->
+    <button onclick="alert('بیک اپ فائل اپلوڈ کریں...')" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded shadow transition flex items-center font-bold text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        </svg>
+        امپورٹ کریں
+    </button>
+
+    <!-- 3 برانچز والا ڈائنامک ڈراپ ڈاؤن -->
+    <select id="branchSelector" onchange="changeBranch()" class="text-white px-4 py-2 rounded-full font-bold shadow transition mr-2 cursor-pointer outline-none appearance-none text-center min-w-[140px]">
+        <option value="central" class="bg-white text-black">مرکزی شعبہ</option>
+        <option value="other" class="bg-white text-black">دیگر برانچز</option>
+        <option value="girls" class="bg-white text-black">شعبہ بنات</option>
+    </select>
+
+</div>
         </div>
+           
+
     </header>
 
     <!-- مین مینیو (Top Navigation) -->
@@ -44,7 +70,7 @@
             <ul class="flex flex-wrap justify-center space-x-6 space-x-reverse py-2 text-lg font-bold relative">
                 <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">صفحہ اول</li>
                 <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition" onclick="window.location.href='admission.html'">داخلہ فارم</li>
-                <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">طالب علم کارڈ</li>
+                <!-- <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">طالب علم کارڈ</li> -->
                 <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">رزلٹ بنائیے</li>
                 <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">ترقی <span class="student-label">طالب علم</span></li>
                 <li class="cursor-pointer hover:bg-yellow-600 px-3 py-1 rounded transition">نیا درجہ </li>
@@ -67,7 +93,87 @@
             </ul>
         </div>
     </nav>
+<!-- ڈیش بورڈ اعداد و شمار (Statistics Cards) -->
+<div class="container mx-auto px-6 flex items-center justify-center min-h-[60vh]">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+        
+        <!-- کارڈ 1: مرکزی شعبہ -->
+        <div class="bg-white rounded-xl shadow-lg border-t-8 border-green-700 overflow-hidden">
+            <div class="bg-green-50 text-green-900 text-center py-4 text-2xl font-bold border-b border-green-200">
+                مرکزی شعبہ
+            </div>
+            <div class="p-4">
+                <table class="w-full text-center border-collapse text-lg">
+                    <tbody>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 text-gray-700 font-bold w-1/2 border-l border-gray-200">رہائشی</td>
+                            <td class="py-3 text-blue-600 font-bold" id="central_res">0</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 text-gray-700 font-bold border-l border-gray-200">غیر رہائشی</td>
+                            <td class="py-3 text-purple-600 font-bold" id="central_nonres">0</td>
+                        </tr>
+                        <tr class="bg-gray-100">
+                            <td class="py-3 text-gray-900 font-bold border-l border-gray-200">کل تعداد</td>
+                            <td class="py-3 text-green-700 font-bold text-2xl" id="central_total">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
+        <!-- کارڈ 2: شعبہ بنات -->
+        <div class="bg-white rounded-xl shadow-lg border-t-8 border-pink-600 overflow-hidden">
+            <div class="bg-pink-50 text-pink-900 text-center py-4 text-2xl font-bold border-b border-pink-200">
+                شعبہ بنات
+            </div>
+            <div class="p-4">
+                <table class="w-full text-center border-collapse text-lg">
+                    <tbody>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 text-gray-700 font-bold w-1/2 border-l border-gray-200">رہائشی</td>
+                            <td class="py-3 text-blue-600 font-bold" id="girls_res">0</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 text-gray-700 font-bold border-l border-gray-200">غیر رہائشی</td>
+                            <td class="py-3 text-purple-600 font-bold" id="girls_nonres">0</td>
+                        </tr>
+                        <tr class="bg-gray-100">
+                            <td class="py-3 text-gray-900 font-bold border-l border-gray-200">کل تعداد</td>
+                            <td class="py-3 text-pink-700 font-bold text-2xl" id="girls_total">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- کارڈ 3: دیگر برانچز -->
+        <div class="bg-white rounded-xl shadow-lg border-t-8 border-teal-600 overflow-hidden">
+            <div class="bg-teal-50 text-teal-900 text-center py-4 text-2xl font-bold border-b border-teal-200">
+                دیگر برانچز
+            </div>
+            <div class="p-4">
+                <table class="w-full text-center border-collapse text-lg">
+                    <tbody>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 text-gray-700 font-bold w-1/2 border-l border-gray-200">رہائشی</td>
+                            <td class="py-3 text-blue-600 font-bold" id="other_res">0</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 text-gray-700 font-bold border-l border-gray-200">غیر رہائشی</td>
+                            <td class="py-3 text-purple-600 font-bold" id="other_nonres">0</td>
+                        </tr>
+                        <tr class="bg-gray-100">
+                            <td class="py-3 text-gray-900 font-bold border-l border-gray-200">کل تعداد</td>
+                            <td class="py-3 text-teal-700 font-bold text-2xl" id="other_total">0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
    
     <!-- فوٹر (رپورٹس سیکشن) -->
     <footer class="bg-blue-900 text-white p-6 mt-auto">
@@ -93,35 +199,89 @@
     </footer>
 
     <!-- ڈائنیمک لیبلز جاوا اسکرپٹ -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const activeBranch = localStorage.getItem('activeBranch') || 'central';
-            
-            // برانچ کا بیج اپڈیٹ کریں
-            const branchDisplay = document.getElementById('branchDisplay');
-            if(activeBranch === 'girls') branchDisplay.innerText = 'شعبہ بنات (طالبات)';
-            else if(activeBranch === 'branches') branchDisplay.innerText = 'دیگر برانچز';
-            
-            // طالبات والے سیکشن کی اصطلاحات تبدیل کریں
-            if(activeBranch === 'girls') {
-                document.getElementById('teacherMenuLabel').innerText = 'معلمات';
-                
-                document.querySelectorAll('.student-label').forEach(el => {
-                    el.innerText = 'طالبہ';
-                });
-                
-                document.querySelectorAll('.student-plural-label').forEach(el => {
-                    el.innerText = 'طالبات';
-                });
-            }
-        });
+   <script type="module">
+    import { supabase } from './js/supabase.js';
 
-        function logout() {
-            if(confirm('کیا آپ واقعی پروگرام بند کر کے لاگ آؤٹ کرنا چاہتے ہیں؟')) {
-                localStorage.removeItem('activeBranch');
-                window.location.href = 'index.html';
-            }
+    // پیج لوڈ ہونے پر برانچ کی سیٹنگ اور ڈیٹا بیس سے گنتی لانا
+    document.addEventListener('DOMContentLoaded', async () => {
+        // 1. ڈراپ ڈاؤن کی پرانی سیٹنگ
+        const currentBranch = localStorage.getItem('activeBranch') || 'central';
+        const branchSelector = document.getElementById('branchSelector');
+        
+        if (branchSelector) {
+            branchSelector.value = currentBranch;
+            if(currentBranch === 'girls') branchSelector.classList.add('bg-pink-600', 'hover:bg-pink-700');
+            else if(currentBranch === 'other') branchSelector.classList.add('bg-teal-600', 'hover:bg-teal-700');
+            else branchSelector.classList.add('bg-green-700', 'hover:bg-green-800');
         }
-    </script>
+
+        // 2. Supabase سے طلباء کا ڈیٹا لانا اور گنتی کرنا
+        try {
+            const { data, error } = await supabase.from('students').select('branch_type, residential_status');
+            if (error) throw error;
+
+            let stats = {
+                central: { res: 0, nonres: 0, total: 0 },
+                girls: { res: 0, nonres: 0, total: 0 },
+                other: { res: 0, nonres: 0, total: 0 }
+            };
+
+            // لوپ چلا کر ہر طالب علم کی معلومات کے حساب سے پلس (+) کرنا
+            data.forEach(student => {
+                const branch = student.branch_type;
+                if (stats[branch] !== undefined) {
+                    stats[branch].total++; // کل تعداد میں 1 کا اضافہ
+                    
+                    if (student.residential_status === 'رہائشی') {
+                        stats[branch].res++; // رہائشی میں اضافہ
+                    } else {
+                        stats[branch].nonres++; // غیر رہائشی میں اضافہ
+                    }
+                }
+            });
+
+            // گنتی کو HTML کارڈز میں پرنٹ کرنا
+            document.getElementById('central_res').innerText = stats.central.res;
+            document.getElementById('central_nonres').innerText = stats.central.nonres;
+            document.getElementById('central_total').innerText = stats.central.total;
+
+            document.getElementById('girls_res').innerText = stats.girls.res;
+            document.getElementById('girls_nonres').innerText = stats.girls.nonres;
+            document.getElementById('girls_total').innerText = stats.girls.total;
+
+            document.getElementById('other_res').innerText = stats.other.res;
+            document.getElementById('other_nonres').innerText = stats.other.nonres;
+            document.getElementById('other_total').innerText = stats.other.total;
+
+        } catch (err) {
+            console.error("Error fetching stats:", err);
+        }
+    });
+
+    // لاگ آؤٹ اور برانچ تبدیل کرنے کے فنکشنز کو گلوبل بنانا
+    window.changeBranch = function() {
+        const branchSelector = document.getElementById('branchSelector');
+        localStorage.setItem('activeBranch', branchSelector.value);
+        window.location.reload();
+    }
+
+    window.logoutUser = function() {
+        const confirmLogout = confirm('کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟');
+        if(confirmLogout) window.location.href = 'index.html'; 
+    }
+</script>
+    <!-- <script>
+    // // لاگ آؤٹ کرنے کا فنکشن
+    // function logoutUser() {
+    //     const confirmLogout = confirm('کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟');
+    //     if(confirmLogout) {
+    //         // اگر کوئی سیشن وغیرہ ہے تو اسے کلیئر کر دیں
+    //         // localStorage.clear(); 
+            
+    //         // لاگ ان پیج پر واپس بھیج دیں (یہاں اپنے لاگ ان پیج کا نام لکھیں)
+    //         window.location.href = 'index.html'; 
+    //     }
+    // }
+</script> -->
 </body>
 </html>

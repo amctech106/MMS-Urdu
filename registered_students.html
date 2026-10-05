@@ -14,7 +14,6 @@
             font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
             background-color: #f3f4f6;
         }
-        /* ٹیبل کی سیٹنگز تصویر کے مطابق */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -33,7 +32,6 @@
             font-size: 1.2rem;
             font-weight: normal;
         }
-        /* گرے بیک گراؤنڈ والے خانے */
         .bg-gray-cell {
             background-color: #e5e7eb;
         }
@@ -41,7 +39,6 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- ٹاپ نیویگیشن (ڈیش بورڈ پر واپس جانے کے لیے) -->
     <nav class="bg-green-700 text-white p-4 shadow-md">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold">داخل شدہ طلباء کی رپورٹ</h1>
@@ -49,42 +46,42 @@
         </div>
     </nav>
 
-    <!-- مین کنٹینر -->
     <main class="container mx-auto p-6 flex-grow">
         <div class="bg-white p-8 rounded-lg shadow-xl border-t-4 border-green-700">
             
-            <!-- ہدایاتی جملہ -->
             <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-800">کسی بھی طالب علم کی داخلہ فارم نکالنے کے لئے اس کے داخلہ فارم کے لنک پر کلک کریں۔</h2>
+                <h2 class="text-2xl font-bold text-gray-800">کسی بھی طالب علم کا داخلہ فارم نکالنے کے لئے اس کے داخلہ فارم کے لنک پر کلک کریں۔</h2>
             </div>
 
             <!-- فلٹرز کا سیکشن -->
             <div class="flex flex-wrap justify-center items-center gap-6 mb-6">
-                <!-- درجہ منتخب کریں -->
+                <!-- درجہ منتخب کریں (فارم والے اصلی درجات) -->
                 <div class="flex items-center gap-2">
                     <label class="text-lg font-bold">درجہ منتخب کریں</label>
-                    <select id="classFilter" class="px-4 py-1 border border-gray-400 rounded w-48 bg-white">
-                        <option value="">منتخب کریں...</option>
-                        <option value="تجوید">تجوید</option>
-                        <option value="ناظرہ">ناظرہ</option>
+                    <select id="classFilter" class="px-4 py-1 border border-gray-400 rounded w-64 bg-white">
+                        <option value="">تمام درجات</option>
+                        <option value="قاری محمد اسحاق (ناظرہ)">قاری محمد اسحاق (ناظرہ)</option>
+                        <option value="تحفیظ القرآن">تحفیظ القرآن</option>
+                        <option value="تجوید سال اول">تجوید سال اول</option>
+                        <option value="عالمہ / عالم سال اول">عالمہ / عالم سال اول</option>
                     </select>
                 </div>
 
                 <!-- تاریخ سے -->
                 <div class="flex items-center gap-2">
                     <label class="text-lg font-bold">تاریخ سے</label>
-                    <input type="date" id="fromDate" value="2026-10-03" class="px-4 py-1 border border-gray-400 rounded bg-white">
+                    <input type="date" id="fromDate" class="px-4 py-1 border border-gray-400 rounded bg-white">
                 </div>
 
                 <!-- تاریخ تک -->
                 <div class="flex items-center gap-2">
                     <label class="text-lg font-bold">تاریخ تک</label>
-                    <input type="date" id="toDate" value="2027-10-04" class="px-4 py-1 border border-gray-400 rounded bg-white">
+                    <input type="date" id="toDate" class="px-4 py-1 border border-gray-400 rounded bg-white">
                 </div>
 
                 <!-- تلاش کا بٹن -->
                 <div>
-                    <button class="bg-[#0f172a] text-white px-6 py-1.5 font-bold hover:bg-gray-800 transition rounded border border-gray-500 shadow">
+                    <button id="searchBtn" class="bg-[#0f172a] text-white px-6 py-1.5 font-bold hover:bg-gray-800 transition rounded border border-gray-500 shadow">
                         تلاش کریں
                     </button>
                 </div>
@@ -99,30 +96,15 @@
                             <th class="w-48">اسم الطالب</th>
                             <th class="w-32">رجسٹریشن نمبر</th>
                             <th class="w-28">تاریخ پیدائش</th>
-                            <th class="w-20">رول نمبر</th>
+                            <th class="w-20">داخلہ نمبر</th>
                             <th>مستقل پتہ</th>
                             <th class="bg-gray-cell text-black font-bold border-black w-32">درجہ</th>
                             <th class="w-28">داخلہ فارم</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <!-- ڈیمو ریکارڈ (بالکل تصویر جیسا) -->
                         <tr>
-                            <td class="bg-gray-cell">1</td>
-                            <td class="bg-gray-cell text-lg">محسن ولد عبدالغفار</td>
-                            <td class="bg-gray-cell text-blue-600 tracking-wider font-sans"><a href="#" class="hover:underline">1448-37-000444</a></td>
-                            <td class="bg-gray-cell font-sans">16-07-2013</td>
-                            <td class="bg-gray-cell font-sans">728</td>
-                            <td class="bg-gray-cell text-base leading-relaxed text-right">
-                                مکان نمبر ایل 258، گلی نمبر 13، مچھر کالونی، اسکیم 33، گڈاپ ٹاؤن بلاک سی کراچی شرقی
-                            </td>
-                            <td class="bg-gray-cell font-bold text-lg leading-tight">
-                                قاری محمد اسحاق<br>(ناظرہ)
-                            </td>
-                            <td class="bg-gray-cell">
-                                <!-- یہاں ہم نے print_form.html کا لنک دیا ہے -->
-                                <a href="print_form.html?reg=1448-37-000444" class="text-blue-600 text-lg hover:underline font-bold">داخلہ فارم</a>
-                            </td>
+                            <td colspan="8" class="bg-gray-cell text-center py-6 text-lg font-bold">ڈیٹا لوڈ ہو رہا ہے...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -131,5 +113,99 @@
         </div>
     </main>
 
+    <!-- جاوا اسکرپٹ -->
+    <script type="module">
+        import { supabase } from './js/supabase.js';
+
+        const tableBody = document.getElementById('tableBody');
+        const classFilter = document.getElementById('classFilter');
+        const fromDate = document.getElementById('fromDate');
+        const toDate = document.getElementById('toDate');
+        const searchBtn = document.getElementById('searchBtn');
+
+        let allStudents = [];
+
+        // 1. ڈیٹا بیس سے طلباء کا ریکارڈ لانا
+        async function fetchRegisteredStudents() {
+            try {
+                const activeBranch = localStorage.getItem('activeBranch') || 'central';
+                
+                const { data, error } = await supabase
+                    .from('students')
+                    .select('*')
+                    .eq('branch_type', activeBranch)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                
+                allStudents = data;
+                displayData(allStudents);
+            } catch (err) {
+                console.error("Error:", err);
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-red-500 py-4">ڈیٹا لوڈ کرنے میں مسئلہ پیش آیا۔</td></tr>`;
+            }
+        }
+
+        // 2. ٹیبل میں ریکارڈ دکھانا
+        function displayData(data) {
+            tableBody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="bg-gray-cell text-center py-4">کوئی ریکارڈ نہیں ملا۔</td></tr>`;
+                return;
+            }
+
+            data.forEach((student, index) => {
+                const tr = document.createElement('tr');
+                // تاریخ پیدائش کا فارمیٹ تبدیل کرنا (YYYY-MM-DD سے DD-MM-YYYY)
+                const dobFormatted = student.dob ? student.dob.split('-').reverse().join('-') : '-';
+                
+                tr.innerHTML = `
+                    <td class="bg-gray-cell">${index + 1}</td>
+                    <td class="bg-gray-cell text-lg font-bold">${student.student_name || '-'}</td>
+                    <td class="bg-gray-cell text-blue-600 tracking-wider font-sans"><a href="print_form.html?reg=${student.reg_number}" class="hover:underline">${student.reg_number || '-'}</a></td>
+                    <td class="bg-gray-cell font-sans">${dobFormatted}</td>
+                    <td class="bg-gray-cell font-sans">${student.admission_number || '-'}</td>
+                    <td class="bg-gray-cell text-base leading-relaxed text-right">${student.permanent_address || '-'}</td>
+                    <td class="bg-gray-cell font-bold text-lg leading-tight text-red-600">${student.class_name || '-'}</td>
+                    <td class="bg-gray-cell flex flex-col gap-1 items-center justify-center">
+    <a href="print_form.html?reg=${student.reg_number}" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition">فارم پرنٹ</a>
+    <a href="id_card.html?reg=${student.reg_number}" class="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 transition">ID کارڈ</a>
+</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // 3. فلٹر کرنے کا فنکشن (جب تلاش کریں بٹن دبایا جائے)
+        searchBtn.addEventListener('click', () => {
+            const selectedClass = classFilter.value;
+            const start = fromDate.value;
+            const end = toDate.value;
+
+            let filteredData = allStudents;
+
+            // درجہ کے لحاظ سے فلٹر
+            if (selectedClass) {
+                filteredData = filteredData.filter(student => student.class_name === selectedClass);
+            }
+            
+            // تاریخ سے فلٹر
+            if (start) {
+                filteredData = filteredData.filter(student => student.admission_date >= start);
+            }
+            
+            // تاریخ تک فلٹر
+            if (end) {
+                filteredData = filteredData.filter(student => student.admission_date <= end);
+            }
+
+            displayData(filteredData);
+        });
+
+        // پیج لوڈ ہوتے ہی فنکشن چلانا
+        document.addEventListener('DOMContentLoaded', fetchRegisteredStudents);
+
+    </script>
 </body>
 </html>

@@ -107,9 +107,10 @@
                     </div>
                 </td>
                 <!-- تصویر کا خانہ -->
-                <td rowspan="3" class="w-32 p-1 text-center bg-gray-50">
-                    <img id="lbl_studentPhoto" src="" alt="تصویر" class="w-full h-36 object-cover border border-gray-400" onerror="this.outerHTML='<div class=\'w-full h-36 border border-gray-400 flex items-center justify-center text-sm text-gray-500\'>تصویر موجود نہیں</div>'">
-                </td>
+                <!-- تصویر کا خانہ (جو 3 لائنوں پر محیط ہے) -->
+<td rowspan="3" class="w-32 p-1 text-center bg-gray-50">
+   <img id="lbl_studentPhoto" src="" alt="تصویر" class="w-full h-36 object-cover border border-gray-400">
+</td>
             </tr>
             <!-- لائن 2 -->
             <tr>
@@ -290,11 +291,11 @@
                     document.getElementById('dynamicDepartment').innerText = data.department || (data.branch_type === 'girls' ? 'شعبہ بنات' : 'تحفیظ القرآن');
                     document.getElementById('lbl_parentLabel').innerText = data.branch_type === 'girls' ? 'بنت:' : 'ولدیت:';
 
-                    // ہیڈر اور نمبرز
-                    document.getElementById('lbl_affiliateNumber').innerText = data.affiliate_number || '------';
-                    document.getElementById('lbl_regNumberTop').innerText = data.reg_number || '------';
-                    document.getElementById('lbl_regNumberBottom').innerText = data.reg_number || '------';
-                    document.getElementById('lbl_admissionNumber').innerText = data.admission_number || '------';
+                    
+                   // ہیڈر اور نمبرز
+document.getElementById('lbl_affiliateNumber').innerText = ''; // مدرسے کا الحاق نمبر (خالی کر دیا)
+document.getElementById('lbl_regNumberTop').innerText = ''; // مدرسے کا رجسٹریشن نمبر (خالی کر دیا)
+document.getElementById('lbl_regNumberBottom').innerText = data.reg_number || '------'; // یہ طالب علم کا رجسٹریشن نمبر ہے (یہ ایسے ہی رہے گا)
 
                     // طالب علم کا نام اور ولدیت
                     document.getElementById('lbl_studentName').innerText = data.student_name || '----';
