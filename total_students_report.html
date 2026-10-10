@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفصیلی رپورٹ رجسٹرڈ طلباء - مدرسہ مینجمنٹ سسٹم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Excel Export کے لیے لائیبریری -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- PDF Export کے لیے لائیبریری -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        @font-face {
+            font-family: 'JameelNooriNastaleeq';
+            src: url('./fonts/Jameel\ Noori\ Nastaleeq.ttf') format('truetype');
+        }
+        body {
+            font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
+            background-color: #ffffff;
+        }
+        
+        /* ٹیبل کی مخصوص سیٹنگز (تصویر کے مطابق) */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 14px;
+        }
+        .report-table th, .report-table td {
+            border: 1px solid #000000;
+            padding: 4px;
+            vertical-align: middle;
+        }
+        .report-table th {
+            font-weight: normal;
+        }
+
+        /* پرنٹ کرتے وقت کنٹرولز کو چھپانا اور پیج سیٹ کرنا */
+        @media print {
+            .no-print { display: none !important; }
+    @page { margin: 10mm; }
+            body { background-color: white; }
+            .printable-area { width: 100%; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- ٹاپ نیویگیشن (پرنٹ میں نہیں آئے گا) -->
+    <nav class="bg-green-700 text-white p-3 shadow-md no-print">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">تفصیلی رپورٹ رجسٹرڈ طلباء</h1>
+            <a href="dashboard.html" class="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 transition font-bold">واپس ڈیش بورڈ</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 flex-grow">
+        
+        <!-- کنٹرول پینل (تصویر کے مطابق گرے رنگ کا ڈبہ) -->
+        <div class="bg-gray-200 border border-gray-400 rounded p-4 mb-4 no-print text-center">
+            
+            <!-- فلٹرز -->
+            <div class="flex flex-wrap justify-center items-center gap-4 mb-4 font-bold text-lg">
+                <button onclick="fetchReport()" class="bg-blue-900 text-white px-6 py-1 rounded border border-blue-950 hover:bg-blue-800">رپورٹ دکھائیں</button>
+                
+                <div class="flex items-center gap-2">
+                    <input type="date" id="endDate" class="border border-gray-400 px-2 py-1 outline-none font-sans text-sm">
+                    <label>تاریخ انتہاء</label>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <input type="date" id="startDate" class="border border-gray-400 px-2 py-1 outline-none font-sans text-sm">
+                    <label>تاریخ ابتداء</label>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <select id="classSelect" class="border border-gray-400 px-2 py-1 outline-none min-w-[200px]">
+                        <option value="">درجہ منتخب کریں...</option>
+                        <option value="قاری محمد اسحاق (ناظرہ)">قاری محمد اسحاق (ناظرہ)</option>
+                        <option value="تحفیظ القرآن">تحفیظ القرآن</option>
+                        <option value="تجوید سال اول">تجوید سال اول</option>
+                        <option value="عالمہ / عالم سال اول">عالمہ / عالم سال اول</option>
+                    </select>
+                    <label>درجہ منتخب کریں</label>
+                </div>
+            </div>
+
+            <!-- ایکشن بٹنز (ایکسل، پرنٹ، پی ڈی ایف) -->
+            <div class="flex justify-center items-center gap-4 border-t border-gray-400 pt-3">
+                <button onclick="exportToExcel()" class="bg-blue-900 text-white px-4 py-1 rounded text-sm hover:bg-blue-800">ایکسل میں ایکسپورٹ کریں</button>
+                
+                <button onclick="window.print()" title="پرنٹ کریں" class="bg-white border border-gray-400 p-1 rounded hover:bg-gray-100 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                </button>
+
+                <button onclick="exportToPDF()" title="PDF ڈاؤنلوڈ کریں" class="bg-white border border-gray-400 p-1 rounded hover:bg-gray-100 cursor-pointer text-red-600 font-bold px-2">
+                    PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- پرنٹ ہونے والا حصہ (تصویر والا ہیڈر اور ٹیبل) -->
+        <div id="printableArea" class="printable-area border border-gray-400 p-2 bg-white">
+            
+            <!-- رپورٹ ہیڈر -->
+            <div class="grid grid-cols-3 items-center text-center border-b-2 border-gray-800 pb-2 mb-2">
+                
+                <!-- لیفٹ (الحاق نمبر وغیرہ) -->
+                <div class="text-right text-lg font-bold pr-4 leading-relaxed">
+                    <p>الحاق نمبر: <span class="font-normal">----</span></p>
+                    <p>رجسٹریشن نمبر: <span class="font-normal">----</span></p>
+                    <p>تعلیمی سال: <span id="displayYear" class="font-normal font-sans"></span></p>
+                </div>
+                
+                <!-- سینٹر (کل طلباء) -->
+                <div>
+                    <h2 class="text-3xl font-bold mb-1">کل طلباء</h2>
+                    <p class="text-lg font-bold">تعلیمی درجہ: <span id="displayClass" class="font-normal"></span></p>
+                </div>
+                
+                <!-- رائٹ (مدرسہ کا نام) -->
+                <div class="text-left pl-4">
+                    <h1 class="text-3xl font-bold text-black mb-1">دارالعلوم جامعہ نعیمیہ</h1>
+                    <p class="text-lg font-bold">بلاک نمبر 15 فیڈرل بی ایریا کراچی</p>
+                </div>
+                
+            </div>
+
+            <!-- رپورٹ ٹیبل -->
+            <div class="overflow-x-auto">
+                <table id="reportTable" class="report-table">
+                    <thead>
+                        <tr class="bg-gray-100 font-bold">
+                            <th class="w-10">نمبر<br>شمار</th>
+                            <th class="w-32">طالب علم</th>
+                            <th class="w-32">ولدیت</th>
+                            <th class="w-20">اقامتی /<br>غیر اقامتی</th>
+                            <th class="w-48">مستقل پتہ</th>
+                            <th class="w-48">موجودہ پتہ</th>
+                            <th class="w-32">قومی شناختی کارڈ نمبر</th>
+                            <th class="w-24">تاریخ<br>پیدائش</th>
+                            <th class="w-24">تاریخ داخلہ</th>
+                            <th class="w-24">فون نمبر</th>
+                            <th class="w-24">رجسٹریشن نمبر</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody">
+                        <tr>
+                            <td colspan="11" class="py-8 text-lg text-gray-500 text-center">
+                                رپورٹ دیکھنے کے لیے تاریخ اور درجہ منتخب کر کے "رپورٹ دکھائیں" پر کلک کریں۔
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { supabase } from './js/supabase.js';
+
+        // تاریخ کو DD-MM-YYYY فارمیٹ میں بدلنے کا فنکشن
+        function formatDate(dateString) {
+            if(!dateString) return '-';
+            const parts = dateString.split('-');
+            if(parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            return dateString;
+        }
+
+        window.fetchReport = async function() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const classVal = document.getElementById('classSelect').value;
+
+            if(!classVal) {
+                alert("براہ کرم درجہ منتخب کریں!");
+                return;
+            }
+
+            // ہیڈر کی معلومات اپڈیٹ کرنا
+            document.getElementById('displayClass').innerText = classVal;
+            document.getElementById('displayYear').innerText = startDate ? formatDate(startDate) : 'تمام';
+
+            const tbody = document.getElementById('reportTableBody');
+            tbody.innerHTML = '<tr><td colspan="11" class="py-10 text-xl text-blue-600">ڈیٹا لوڈ ہو رہا ہے...</td></tr>';
+
+            try {
+                // Supabase Query بنانا
+                let query = supabase.from('students').select('*').eq('class_name', classVal);
+                
+                // اگر تاریخ دی گئی ہے تو اس تاریخ کے بعد والے طلباء لانا
+                if(startDate) {
+                    query = query.gte('admission_date', startDate);
+                }
+                if(endDate) {
+                    query = query.lte('admission_date', endDate);
+                }
+
+                // پرانے طلباء اوپر آئیں
+                query = query.order('admission_date', { ascending: true });
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="11" class="py-10 text-xl text-red-600">اس تاریخ اور درجے کا کوئی ریکارڈ نہیں ملا۔</td></tr>`;
+                    return;
+                }
+
+                // ٹیبل میں ڈیٹا بھرنا (بالکل تصویر والی ترتیب کے مطابق)
+                let html = '';
+                data.forEach((student, index) => {
+                    html += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td class="font-bold">${student.student_name || '-'}</td>
+                            <td>${student.parent_name || '-'}</td>
+                            <td>${student.residential_status || '-'}</td>
+                            <td class="text-xs leading-relaxed text-justify px-1">${student.permanent_address || '-'}</td>
+                            <td class="text-xs leading-relaxed text-justify px-1">${student.current_address || '-'}</td>
+                            <td class="font-sans text-sm">${student.id_number_value || '-'}</td>
+                            <td class="font-sans text-sm">${formatDate(student.dob)}</td>
+                            <td class="font-sans text-sm">${formatDate(student.admission_date)}</td>
+                            <td class="font-sans text-sm">${student.phone || student.guardian_phone || '-'}</td>
+                            <td class="font-sans font-bold text-sm">${student.reg_number || '-'}</td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+
+            } catch (err) {
+                alert("رپورٹ لانے میں مسئلہ: " + err.message);
+            }
+        };
+
+        // 2. ایکسل (Excel) میں ایکسپورٹ کرنے کا فنکشن
+        window.exportToExcel = function() {
+            const table = document.getElementById('reportTable');
+            const wb = XLSX.utils.table_to_book(table, {sheet: "Students Report"});
+            const className = document.getElementById('displayClass').innerText || 'Report';
+            XLSX.writeFile(wb, `Students_Report_${className}.xlsx`);
+        };
+
+        // 3. پی ڈی ایف (PDF) میں ڈاؤنلوڈ کرنے کا فنکشن
+        window.exportToPDF = function() {
+            const element = document.getElementById('printableArea');
+            const className = document.getElementById('displayClass').innerText || 'Report';
+            
+            const opt = {
+                margin:       0.5,
+                filename:     `Students_Report_${className}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+            };
+
+            // PDF بنانا شروع کریں
+            html2pdf().set(opt).from(element).save();
+        };
+    </script>
+</body>
+</html>

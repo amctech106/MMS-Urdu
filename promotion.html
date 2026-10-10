@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ترقی طالب علم - مدرسہ مینجمنٹ سسٹم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'JameelNooriNastaleeq';
+            src: url('./fonts/Jameel\ Noori\ Nastaleeq.ttf') format('truetype');
+        }
+        body {
+            font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+        table, th, td {
+            border: 1px solid #d1d5db;
+        }
+        th {
+            background-color: #000000;
+            color: #ffffff;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- ٹاپ نیویگیشن (مختصر) -->
+    <nav class="bg-green-700 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">طالب علم کی ایک درجہ سے دوسرے درجہ میں ترقی</h1>
+            <a href="dashboard.html" class="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 transition font-bold">واپس ڈیش بورڈ</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 flex-grow">
+        
+        <!-- فلٹر سیکشن (پہلے والی تصویر کے مطابق) -->
+        <div class="bg-white p-6 rounded-lg shadow-md text-center mb-6">
+            <p class="text-lg mb-4">مندرجہ ذیل درجات پر کلک کریں تاکہ ان درجات میں مکمل طلباء کی لسٹ دیکھ کر اس میں سے کسی بھی طالب علم کا درجہ آسانی سے تبدیل کیا جاسکے۔</p>
+            
+            <div class="flex flex-wrap justify-center items-end gap-4">
+                <div>
+                    <label class="block text-gray-700 font-bold mb-1">تاریخ ابتداء</label>
+                    <input type="date" id="filterStartDate" class="border px-4 py-2 rounded-md bg-gray-50 outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-1">تاریخ انتہاء</label>
+                    <input type="date" id="filterEndDate" class="border px-4 py-2 rounded-md bg-gray-50 outline-none">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-bold mb-1">موجودہ درجہ منتخب کریں</label>
+                    <select id="filterClass" class="border px-4 py-2 rounded-md bg-gray-50 outline-none min-w-[200px]">
+                        <option value="">درجہ منتخب کریں...</option>
+                        <option value="قاری محمد اسحاق (ناظرہ)">قاری محمد اسحاق (ناظرہ)</option>
+                        <option value="تحفیظ القرآن">تحفیظ القرآن</option>
+                        <option value="تجوید سال اول">تجوید سال اول</option>
+                        <option value="عالمہ / عالم سال اول">عالمہ / عالم سال اول</option>
+                    </select>
+                </div>
+                <button onclick="fetchStudentsForPromotion()" class="bg-green-700 text-white px-6 py-2 rounded hover:bg-green-800 transition font-bold shadow">
+                    لسٹ دکھائیں
+                </button>
+            </div>
+        </div>
+
+        <!-- طلباء کا ٹیبل اور پروموشن سیکشن (ڈیفالٹ چھپا ہوا) -->
+        <div id="promotionSection" class="hidden bg-white shadow-md rounded-lg overflow-hidden">
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-center text-sm md:text-base border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-2 w-12">
+                                <!-- سلیکٹ آل چیک باکس -->
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" class="w-4 h-4 cursor-pointer">
+                            </th>
+                            <th class="py-2 px-2">درجہ</th>
+                            <th class="py-2 px-2 w-1/4">مستقل پتہ</th>
+                            <th class="py-2 px-2">داخلہ نمبر</th>
+                            <th class="py-2 px-2">تاریخ داخلہ</th>
+                            <th class="py-2 px-2">رجسٹریشن نمبر</th>
+                            <th class="py-2 px-2">اسم الطالب</th>
+                            <th class="py-2 px-2 w-12">نمبر شمار</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- جاوا اسکرپٹ کے ذریعے ڈیٹا یہاں آئے گا -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- نیچے والا نیلا ایکشن بار (دوسری تصویر کے مطابق) -->
+            <div class="bg-blue-800 text-white p-4">
+                <p class="text-center mb-3 font-bold">اس درجہ کے تمام / منتخب طلباء کو دوسرے درجہ میں منتقل کرنے کے لئے نیا درجہ اور تاریخ منتخب کریں اور "منتقل کریں" پر کلک کریں۔</p>
+                <div class="flex flex-wrap justify-center items-center gap-3">
+                    
+                    <div>
+                        <label class="text-sm">نئی تاریخ داخلہ:</label>
+                        <input type="date" id="newStartDate" class="text-black px-2 py-1 rounded outline-none ml-2">
+                    </div>
+                    
+                    <div>
+                        <label class="text-sm">نیا اختتام داخلہ:</label>
+                        <input type="date" id="newEndDate" class="text-black px-2 py-1 rounded outline-none ml-2">
+                    </div>
+
+                    <div>
+                        <select id="newClassSelect" class="text-black px-2 py-1 rounded outline-none ml-2 w-48">
+                            <option value="">نیا درجہ منتخب کریں...</option>
+                            <option value="قاری محمد اسحاق (ناظرہ)">قاری محمد اسحاق (ناظرہ)</option>
+                            <option value="تحفیظ القرآن">تحفیظ القرآن</option>
+                            <option value="تجوید سال اول">تجوید سال اول</option>
+                            <option value="عالمہ / عالم سال اول">عالمہ / عالم سال اول</option>
+                            <option value="فارغ التحصیل">فارغ التحصیل (پاس آؤٹ)</option>
+                        </select>
+                    </div>
+
+                    <button id="promoteButton" class="bg-white text-blue-900 px-6 py-1 rounded hover:bg-gray-200 transition font-bold shadow-md">
+                        منتقل کریں
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+   <script type="module">
+        import { supabase } from './js/supabase.js';
+
+        // 1. طلباء کی لسٹ لانے کا فنکشن
+        window.fetchStudentsForPromotion = async function() {
+            const filterClass = document.getElementById('filterClass').value;
+            if(!filterClass) {
+                alert("براہ کرم پہلے موجودہ درجہ منتخب کریں۔");
+                return;
+            }
+
+            // لوڈنگ دکھانا
+            const tbody = document.getElementById('studentsTableBody');
+            tbody.innerHTML = '<tr><td colspan="8" class="py-10 text-xl text-green-700">ڈیٹا لوڈ ہو رہا ہے...</td></tr>';
+            document.getElementById('promotionSection').classList.remove('hidden');
+
+            try {
+                // Supabase سے مخصوص کلاس کا ڈیٹا لانا
+                const { data, error } = await supabase
+                    .from('students')
+                    .select('*')
+                    .eq('class_name', filterClass)
+                    .order('created_at', { ascending: true }); 
+
+                if (error) throw error;
+
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="py-10 text-xl text-red-600">اس درجے میں کوئی طالب علم موجود نہیں۔</td></tr>`;
+                    return;
+                }
+
+                // ٹیبل میں ڈیٹا بھرنا
+                let html = '';
+                data.forEach((student, index) => {
+                    html += `
+                        <tr class="hover:bg-gray-50 transition border-b">
+                            <td class="py-2">
+                                <input type="checkbox" value="${student.reg_number}" class="student-checkbox w-4 h-4 cursor-pointer text-blue-600">
+                            </td>
+                            <td class="py-2 text-blue-600">${student.class_name || '-'}</td>
+                            <td class="py-2 text-xs md:text-sm px-1 leading-relaxed">${student.permanent_address || student.current_address || '-'}</td>
+                            <td class="py-2 text-blue-600 font-bold">${student.admission_number || '-'}</td>
+                            <td class="py-2">${student.admission_date || '-'}</td>
+                            <td class="py-2 text-blue-600 font-bold">${student.reg_number}</td>
+                            <td class="py-2 font-bold">${student.student_name}</td>
+                            <td class="py-2">${index + 1}</td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+                document.getElementById('selectAllCheckbox').checked = false;
+
+            } catch (err) {
+                alert("ڈیٹا لانے میں مسئلہ: " + err.message);
+            }
+        };
+
+        // 2. Select All چیک باکس کا فنکشن
+        window.toggleSelectAll = function() {
+            const selectAllBox = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            
+            checkboxes.forEach(box => {
+                box.checked = selectAllBox.checked;
+            });
+        };
+
+        // 3. منتخب طلباء کو منتقل کرنے کا فنکشن
+        window.promoteSelectedStudents = async function() {
+            const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+            const newClass = document.getElementById('newClassSelect').value;
+            const newStartDate = document.getElementById('newStartDate').value;
+            const newEndDate = document.getElementById('newEndDate').value;
+
+            // چیک کرنا کہ یوزر نے معلومات دی ہیں یا نہیں
+            if(checkboxes.length === 0) {
+                alert("براہ کرم منتقل کرنے کے لیے کم از کم ایک طالب علم کو منتخب کریں!");
+                return;
+            }
+            if(!newClass) {
+                alert("براہ کرم نیچے دی گئی لسٹ سے 'نیا درجہ' منتخب کریں۔");
+                return;
+            }
+
+            // تصدیق لینا
+            const confirmMsg = `کیا آپ واقعی ان ${checkboxes.length} طلباء کو '${newClass}' میں منتقل کرنا چاہتے ہیں؟`;
+            if(!confirm(confirmMsg)) return;
+
+            try {
+                let updateData = { class_name: newClass };
+                if(newStartDate) updateData.admission_date = newStartDate;
+                if(newEndDate) updateData.end_date = newEndDate;
+
+                // لوپ کے ذریعے ایک ایک کر کے اپڈیٹ کرنا
+                for(let i = 0; i < checkboxes.length; i++) {
+                    const regNum = checkboxes[i].value;
+                    const { error } = await supabase
+                        .from('students')
+                        .update(updateData)
+                        .eq('reg_number', regNum);
+                    
+                    if (error) {
+                        console.error("Error updating: ", regNum, error);
+                        throw error;
+                    }
+                }
+
+                alert(`الحمدللہ! ${checkboxes.length} طلباء کامیابی کے ساتھ نئے درجے میں منتقل ہو گئے ہیں۔`);
+                
+                // ٹیبل کو ریفریش کرنا
+                window.fetchStudentsForPromotion(); 
+
+            } catch(err) {
+                alert("منتقل کرنے میں مسئلہ آیا: " + err.message);
+            }
+        };
+
+        // 4. منتقل کریں بٹن کے لیے ایونٹ لسنر
+        document.addEventListener('DOMContentLoaded', function() {
+            const promoteButton = document.getElementById('promoteButton');
+            if (promoteButton) {
+                promoteButton.addEventListener('click', window.promoteSelectedStudents);
+            }
+        });
+    </script>
+</body>
+</html>

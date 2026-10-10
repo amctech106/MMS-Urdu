@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>روزانہ حاضری رجسٹر - مدرسہ مینجمنٹ سسٹم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        @font-face {
+            font-family: 'JameelNooriNastaleeq';
+            src: url('./fonts/Jameel%20Noori%20Nastaleeq.ttf') format('truetype');
+        }
+        body {
+            font-family: 'JameelNooriNastaleeq', Arial, sans-serif;
+            background-color: #f3f4f6;
+            user-select: none;
+        }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #6b7280; text-align: center; vertical-align: middle; padding: 2px; }
+        th { background-color: #e5e7eb; font-size: 14px; }
+
+        .day-cell { cursor: pointer; font-family: 'JameelNooriNastaleeq', Arial, sans-serif; font-size: 16px; font-weight: bold; width: 22px; transition: background 0.2s; }
+        .day-cell:hover { background-color: #d1d5db; }
+
+        .status-h { color: green; }
+        .status-g { color: red; }
+        .status-r { color: orange; }
+        .status-b { color: blue; }
+
+        .modal-bg { background-color: #e3deaf; }
+
+        /* QR ان پٹ پینل سے باہر ہے تاکہ پینل چھپانے پر بھی اسکینر کام کرے */
+        #qrInput { position: fixed; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; }
+
+        @media print {
+            header, #topPanel, #cameraModal, #attendanceModal, #qrInput { display: none !important; }
+            body { background-color: white; }
+            .container { box-shadow: none; margin: 0; padding: 0; max-width: 100%; }
+            .overflow-x-auto { overflow: visible !important; }
+            th, td { border: 1px solid black !important; }
+            th { -webkit-print-color-adjust: exact; background-color: #e5e7eb !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative" id="mainBody">
+
+    <header class="bg-green-700 text-white p-3 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">روزانہ حاضری رجسٹر</h1>
+            <a href="dashboard.html" class="bg-yellow-500 text-black px-4 py-2 rounded hover:bg-yellow-600 transition font-bold">واپس ڈیش بورڈ</a>
+        </div>
+    </header>
+
+    <div id="topPanel" class="bg-gray-300 border-b-2 border-gray-400 p-4 transition-all duration-300">
+        <div class="container mx-auto flex flex-wrap justify-center items-center gap-3 text-lg font-bold">
+            <button onclick="fetchStudents()" class="bg-blue-900 text-white px-4 py-1 rounded hover:bg-blue-800 shadow">رپورٹ دکھائیں</button>
+            <button onclick="startCameraScanner()" class="bg-purple-700 text-white px-4 py-1 rounded hover:bg-purple-800 shadow">کیمرے سے اسکین</button>
+
+            <button onclick="window.print()" class="bg-gray-700 text-white px-4 py-1 rounded hover:bg-gray-800 shadow">پرنٹ کریں</button>
+            <button onclick="exportTableToExcel('attendanceTable', 'Attendance_Report')" class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700 shadow">ایکسل (Excel)</button>
+
+            <div class="flex items-center gap-1">
+                <input type="month" id="monthSelect" class="border border-gray-400 px-2 py-1 rounded font-sans text-sm">
+                <label for="monthSelect">ماہ</label>
+            </div>
+
+            <div class="flex items-center gap-1">
+                <select id="classSelect" class="border border-gray-400 px-2 py-1 rounded min-w-[130px]">
+                    <option value="">درجہ منتخب کریں...</option>
+                </select>
+                <label for="classSelect">درجہ</label>
+            </div>
+        </div>
+        <div class="text-center mt-3 text-red-600 font-bold text-sm">
+            اس پینل کو چھپانے کے لئے پیج کے کسی بھی حصہ پر ڈبل کلک کریں اور دوبارہ کھولنے کے لئے پھر کسی بھی جگہ پر ڈبل کلک کریں
+        </div>
+    </div>
+
+    <input type="text" id="qrInput" placeholder="QR Scanner Focus Here" autocomplete="off" autofocus>
+
+    <!-- مین ٹیبل ایریا -->
+    <div class="container mx-auto mt-2 bg-white p-2 shadow-lg overflow-x-auto">
+        <h2 class="text-center font-bold text-xl mb-2" id="reportTitle">روزانہ حاضری برائے درجہ: ----- بابت ماہ: -----</h2>
+
+        <table id="attendanceTable">
+            <thead id="attendanceHead"></thead>
+            <tbody id="attendanceBody">
+                <tr><td colspan="39" class="py-10 text-center text-gray-500 text-lg">براہ کرم درجہ منتخب کر کے رپورٹ دکھائیں پر کلک کریں</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- کیمرہ پاپ اپ -->
+    <div id="cameraModal" class="fixed inset-0 bg-black bg-opacity-80 hidden z-50 flex flex-col justify-center items-center">
+        <div class="bg-white p-4 rounded-lg w-[90%] max-w-[400px]">
+            <h3 class="text-center font-bold mb-2">طالب علم کا کارڈ اسکین کریں</h3>
+            <div id="reader" class="w-full"></div>
+            <button onclick="stopCameraScanner()" class="mt-4 w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 font-bold">بند کریں</button>
+        </div>
+    </div>
+
+    <!-- مینول اپڈیٹ پاپ اپ -->
+    <div id="attendanceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center">
+        <div class="modal-bg w-[500px] max-w-[95%] border-2 border-gray-500 shadow-2xl relative font-bold text-lg">
+            <div class="flex justify-between items-center px-2 py-1 text-sm border-b border-gray-500 bg-white bg-opacity-50">
+                <span id="modalHeaderDate" class="font-sans">2</span>
+                <button onclick="closeModal()" class="hover:text-red-600 underline cursor-pointer font-sans text-xs">close or Esc Key</button>
+            </div>
+            <div class="grid grid-cols-2 text-center border-b border-gray-500">
+                <div class="border-l border-gray-500 py-3 font-bold" id="modalStudentName">نام طالب علم</div>
+                <div class="py-3">نام طالب العلم</div>
+            </div>
+            <div class="grid grid-cols-2 text-center border-b border-gray-500">
+                <div class="border-l border-gray-500 py-3 font-sans" id="modalFullDate">2026-10-02</div>
+                <div class="py-3 flex flex-col justify-center">
+                    موجودہ درجہ<br>
+                    <span id="modalClassName" class="font-normal text-base"></span>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 p-4 items-center">
+                <div class="text-center">
+                    <button onclick="saveAttendanceUI()" class="bg-blue-900 text-white px-6 py-2 rounded border border-blue-950 hover:bg-blue-800 shadow-md">
+                        حاضری تبدیل کریں
+                    </button>
+                </div>
+                <div class="flex flex-row-reverse justify-around items-center text-base">
+                    <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="attStatus" value="ح" class="w-4 h-4"> حاضر</label>
+                    <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="attStatus" value="غ" class="w-4 h-4"> غیر حاضر</label>
+                    <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="attStatus" value="ر" class="w-4 h-4"> رخصت</label>
+                    <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="attStatus" value="ب" class="w-4 h-4"> بیمار</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './js/supabase.js';
+
+        // ---------- موجودہ رپورٹ کی حالت (ٹیبل جس مہینے/درجے کا دکھا رہا ہے) ----------
+        const state = { month: '', className: '', days: 0, regNumbers: new Set(), activeReg: '', activeDay: 0 };
+
+        const pad = n => String(n).padStart(2, '0');
+        const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const cellId = (reg, day) => `cell-${reg}-${day}`;
+
+        // سپابیس ایک بار میں صرف 1000 قطاریں دیتا ہے، اس لیے صفحہ بہ صفحہ لانا ضروری ہے
+        async function fetchAll(buildQuery) {
+            const size = 1000;
+            let from = 0, all = [];
+            while (true) {
+                const { data, error } = await buildQuery().range(from, from + size - 1);
+                if (error) throw error;
+                all = all.concat(data || []);
+                if (!data || data.length < size) break;
+                from += size;
+            }
+            return all;
+        }
+
+        function showToast(text, color = 'bg-green-600') {
+            const msg = document.createElement('div');
+            msg.className = `fixed top-4 left-1/2 transform -translate-x-1/2 ${color} text-white px-6 py-2 rounded shadow-lg z-[60] font-bold`;
+            msg.innerText = text;
+            document.body.appendChild(msg);
+            setTimeout(() => msg.remove(), 2500);
+        }
+
+        // موجودہ مہینہ بطور ڈیفالٹ
+        const now = new Date();
+        document.getElementById('monthSelect').value = `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
+
+        async function loadClasses() {
+            try {
+                const rows = await fetchAll(() => supabase.from('students').select('class_name').order('reg_number'));
+                const uniqueClasses = [...new Set(rows.map(item => item.class_name).filter(Boolean))].sort();
+                const classSelect = document.getElementById('classSelect');
+                uniqueClasses.forEach(className => {
+                    const option = document.createElement('option');
+                    option.value = className;
+                    option.innerText = className;
+                    classSelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error("کلاسز لوڈ کرنے میں مسئلہ: ", err.message);
+            }
+        }
+        loadClasses();
+
+        document.getElementById('mainBody').addEventListener('dblclick', function (e) {
+            if (e.target.closest('#attendanceModal') || e.target.closest('#cameraModal') || ['INPUT', 'SELECT', 'BUTTON', 'LABEL'].includes(e.target.tagName)) return;
+            document.getElementById('topPanel').classList.toggle('hidden');
+            document.getElementById('qrInput').focus();
+        });
+
+        // ---------- ٹیبل کا ہیڈر (مہینے کے دنوں کے مطابق) ----------
+        function buildHeader(days) {
+            let h = `<tr>
+                <th rowspan="2" class="w-8">نمبر<br>شمار</th>
+                <th rowspan="2" class="w-40">نام طالب علم</th>
+                <th rowspan="2" class="w-32">ولدیت</th>`;
+            for (let i = 1; i <= days; i++) h += `<th rowspan="2">${pad(i)}</th>`;
+            h += `<th colspan="4" class="text-xs">میزان</th>
+                <th rowspan="2" class="w-16">کیفیت</th>
+            </tr>
+            <tr>
+                <th class="w-6 text-xs text-green-700">ح</th>
+                <th class="w-6 text-xs text-red-600">غ</th>
+                <th class="w-6 text-xs text-orange-600">ر</th>
+                <th class="w-6 text-xs text-blue-600">ب</th>
+            </tr>`;
+            document.getElementById('attendanceHead').innerHTML = h;
+        }
+
+        function statusClass(status) {
+            return { 'ح': 'status-h', 'غ': 'status-g', 'ر': 'status-r', 'ب': 'status-b' }[status] || 'status-g';
+        }
+
+        // ---------- ڈیٹا بیس سے حاضری لوڈ کرنا ----------
+        window.fetchStudents = async function () {
+            const classVal = document.getElementById('classSelect').value;
+            const monthVal = document.getElementById('monthSelect').value;
+
+            if (!classVal || !monthVal) {
+                alert("براہ کرم درجہ اور مہینہ منتخب کریں۔");
+                return;
+            }
+
+            const [y, m] = monthVal.split('-').map(Number);
+            const daysInMonth = new Date(y, m, 0).getDate(); // 28، 29، 30 یا 31
+            const colspan = daysInMonth + 8;
+
+            document.getElementById('reportTitle').innerText = `روزانہ حاضری برائے درجہ: ${classVal} بابت ماہ: ${monthVal}`;
+            const tbody = document.getElementById('attendanceBody');
+            tbody.innerHTML = `<tr><td colspan="${colspan}" class="py-10 text-xl text-blue-600">ڈیٹا لوڈ ہو رہا ہے...</td></tr>`;
+
+            try {
+                const students = await fetchAll(() =>
+                    supabase.from('students').select('*').eq('class_name', classVal).order('reg_number'));
+
+                const attendanceData = await fetchAll(() =>
+                    supabase.from('attendance').select('*')
+                        .eq('class_name', classVal)
+                        .gte('date', `${monthVal}-01`)
+                        .lte('date', `${monthVal}-${pad(daysInMonth)}`)
+                        .order('id'));
+
+                const attMap = {};
+                attendanceData.forEach(rec => {
+                    if (!attMap[rec.reg_number]) attMap[rec.reg_number] = {};
+                    const d = parseInt(rec.date.split('-')[2], 10);
+                    attMap[rec.reg_number][d] = rec.status;
+                });
+
+                // اب ٹیبل کی حالت محفوظ کریں
+                state.month = monthVal;
+                state.className = classVal;
+                state.days = daysInMonth;
+                state.regNumbers = new Set(students.map(s => String(s.reg_number)));
+
+                buildHeader(daysInMonth);
+
+                let html = '';
+                students.forEach((student, index) => {
+                    const reg = student.reg_number;
+                    html += `<tr data-reg="${escapeHtml(reg)}" data-name="${escapeHtml(student.student_name)}">
+                        <td>${index + 1}</td>
+                        <td class="font-bold text-sm">${escapeHtml(student.student_name)}</td>
+                        <td class="text-sm">${escapeHtml(student.parent_name || '-')}</td>`;
+
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const status = attMap[reg]?.[d] || 'غ';
+                        html += `<td class="day-cell ${statusClass(status)}" data-day="${d}" id="${cellId(reg, d)}">${status}</td>`;
+                    }
+
+                    html += `
+                        <td class="font-bold" id="total-h-${reg}">0</td>
+                        <td class="font-bold" id="total-g-${reg}">0</td>
+                        <td class="font-bold" id="total-r-${reg}">0</td>
+                        <td class="font-bold" id="total-b-${reg}">0</td>
+                        <td>-</td>
+                    </tr>`;
+                });
+
+                tbody.innerHTML = html || `<tr><td colspan="${colspan}" class="py-10 text-xl text-red-600">کوئی طالب علم نہیں ملا۔</td></tr>`;
+                students.forEach(student => calculateTotals(student.reg_number));
+                document.getElementById('qrInput').focus();
+
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="${colspan}" class="py-10 text-xl text-red-600">ڈیٹا لوڈ نہیں ہو سکا۔</td></tr>`;
+                alert("مسئلہ: " + err.message);
+            }
+        };
+
+        // خانے پر کلک (event delegation — نام میں اپوسٹروفی ہو تب بھی ٹھیک چلتا ہے)
+        document.getElementById('attendanceBody').addEventListener('click', function (e) {
+            const cell = e.target.closest('.day-cell');
+            if (!cell) return;
+            const row = cell.closest('tr');
+            openModal(row.dataset.reg, row.dataset.name, parseInt(cell.dataset.day, 10));
+        });
+
+        function openModal(regNum, name, day) {
+            state.activeReg = regNum;
+            state.activeDay = day;
+
+            document.getElementById('modalHeaderDate').innerText = day;
+            document.getElementById('modalStudentName').innerText = name;
+            document.getElementById('modalClassName').innerText = state.className;
+            document.getElementById('modalFullDate').innerText = `${state.month}-${pad(day)}`;
+
+            const currentVal = document.getElementById(cellId(regNum, day)).innerText.trim();
+            document.getElementsByName('attStatus').forEach(r => { r.checked = (r.value === currentVal); });
+            document.getElementById('attendanceModal').classList.remove('hidden');
+        }
+
+        window.closeModal = function () {
+            document.getElementById('attendanceModal').classList.add('hidden');
+            document.getElementById('qrInput').focus();
+        };
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === "Escape") closeModal();
+        });
+
+        // ---------- پاپ اپ سے حاضری محفوظ کرنا ----------
+        window.saveAttendanceUI = async function () {
+            const regNum = state.activeReg;
+            const day = state.activeDay;
+            let selectedVal = null;
+            document.getElementsByName('attStatus').forEach(r => { if (r.checked) selectedVal = r.value; });
+
+            if (!selectedVal) {
+                alert("براہ کرم حاضری کی حالت منتخب کریں۔");
+                return;
+            }
+
+            const oldVal = document.getElementById(cellId(regNum, day)).innerText.trim();
+            updateCellUI(regNum, day, selectedVal);
+            closeModal();
+
+            const ok = await saveToDatabase(regNum, day, selectedVal);
+            if (!ok) {
+                updateCellUI(regNum, day, oldVal); // محفوظ نہ ہو سکی تو پرانی حالت واپس
+                alert("حاضری محفوظ نہیں ہو سکی، دوبارہ کوشش کریں۔");
+            }
+        };
+
+        function updateCellUI(regNum, day, status) {
+            const cell = document.getElementById(cellId(regNum, day));
+            if (!cell) return false;
+
+            cell.innerText = status;
+            cell.className = `day-cell ${statusClass(status)}`;
+            calculateTotals(regNum);
+            return true;
+        }
+
+        // ڈیٹا بیس میں محفوظ کرنا — کامیابی پر true، ناکامی پر false
+        async function saveToDatabase(regNum, day, status) {
+            const fullDate = `${state.month}-${pad(day)}`;
+            try {
+                const { data: existing, error: selErr } = await supabase
+                    .from('attendance')
+                    .select('id')
+                    .eq('reg_number', regNum)
+                    .eq('date', fullDate);
+                if (selErr) throw selErr;
+
+                if (existing && existing.length > 0) {
+                    const { error } = await supabase.from('attendance').update({ status }).eq('id', existing[0].id);
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabase.from('attendance').insert({
+                        reg_number: regNum,
+                        class_name: state.className,
+                        date: fullDate,
+                        status
+                    });
+                    if (error) throw error;
+                }
+                return true;
+            } catch (err) {
+                console.error("حاضری محفوظ کرنے میں مسئلہ: ", err.message);
+                return false;
+            }
+        }
+
+        function calculateTotals(regNum) {
+            let h = 0, g = 0, r = 0, b = 0;
+            for (let i = 1; i <= state.days; i++) {
+                const cell = document.getElementById(cellId(regNum, i));
+                if (cell) {
+                    const val = cell.innerText.trim();
+                    if (val === 'ح') h++;
+                    else if (val === 'غ') g++;
+                    else if (val === 'ر') r++;
+                    else if (val === 'ب') b++;
+                }
+            }
+            document.getElementById(`total-h-${regNum}`).innerText = h;
+            document.getElementById(`total-g-${regNum}`).innerText = g;
+            document.getElementById(`total-r-${regNum}`).innerText = r;
+            document.getElementById(`total-b-${regNum}`).innerText = b;
+        }
+
+        // ---------- اسکینر ----------
+        async function processScanData(scannedId) {
+            if (!scannedId) return;
+
+            if (!state.month || !state.className) {
+                alert("پہلے درجہ اور مہینہ منتخب کر کے رپورٹ دکھائیں۔");
+                return;
+            }
+
+            const today = new Date();
+            const currentMonth = `${today.getFullYear()}-${pad(today.getMonth() + 1)}`;
+            if (state.month !== currentMonth) {
+                alert("اسکین سے حاضری صرف موجودہ مہینے کی لگ سکتی ہے۔ براہ کرم موجودہ مہینہ منتخب کر کے رپورٹ دکھائیں۔");
+                return;
+            }
+
+            const targetDay = today.getDate();
+
+            if (!state.regNumbers.has(scannedId)) {
+                alert(`اسکین کیا گیا نمبر (${scannedId}) اس کلاس کی لسٹ میں موجود نہیں!`);
+                return;
+            }
+
+            const oldVal = document.getElementById(cellId(scannedId, targetDay)).innerText.trim();
+            updateCellUI(scannedId, targetDay, 'ح');
+
+            const ok = await saveToDatabase(scannedId, targetDay, 'ح');
+            if (ok) {
+                showToast(`طالب علم ${scannedId} کی حاضری محفوظ ہو گئی۔`);
+            } else {
+                updateCellUI(scannedId, targetDay, oldVal);
+                showToast(`طالب علم ${scannedId} کی حاضری محفوظ نہیں ہو سکی!`, 'bg-red-600');
+            }
+        }
+
+        const qrInput = document.getElementById('qrInput');
+        qrInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                const scannedId = qrInput.value.trim();
+                qrInput.value = '';
+                processScanData(scannedId);
+            }
+        });
+
+        let html5QrcodeScanner = null;
+        window.startCameraScanner = function () {
+            document.getElementById('cameraModal').classList.remove('hidden');
+            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+            html5QrcodeScanner.render((decodedText) => {
+                stopCameraScanner();
+                processScanData(decodedText.trim());
+            }, () => {});
+        };
+
+        window.stopCameraScanner = function () {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().catch(() => {});
+                html5QrcodeScanner = null;
+            }
+            document.getElementById('cameraModal').classList.add('hidden');
+            document.getElementById('qrInput').focus();
+        };
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#attendanceModal') && !e.target.closest('#cameraModal') && !['INPUT', 'SELECT', 'BUTTON', 'LABEL'].includes(e.target.tagName)) {
+                qrInput.focus();
+            }
+        });
+
+        // ---------- ایکسل ایکسپورٹ ----------
+        window.exportTableToExcel = function (tableID, filename = '') {
+            const tableSelect = document.getElementById(tableID);
+            // نوٹ: ٹیگ کو توڑ کر لکھا ہے تاکہ Live Server کا انجیکشن اسکرپٹ نہ توڑے
+            const LT = '<';
+            const html = LT + 'html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">'
+                + LT + 'head>' + LT + 'meta charset="UTF-8">' + LT + '/head>'
+                + LT + 'body dir="rtl">' + tableSelect.outerHTML + LT + '/body>' + LT + '/html>';
+
+            const blob = new Blob(['\ufeff', html], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.download = (filename || 'excel_data') + (state.month ? '_' + state.month : '') + '.xls';
+            a.href = url;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        };
+    </script>
+</body>
+</html>
